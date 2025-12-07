@@ -33,8 +33,6 @@ model User {
   authProvider AuthProvider   @default(local)  // enum
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
-  otp          String?
-  otpExpiry    DateTime?
   profile      String?
   role         UserRole       @default(user)  // enum
   avatarId     String?

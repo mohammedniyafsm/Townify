@@ -30,6 +30,7 @@
   "devDependencies": {
     "@repo/database": "workspace:*",
     "@repo/types": "workspace:*",
+    "@repo/cache": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",

@@ -5,7 +5,7 @@ import { oAuthclient } from "./googleConfig.js";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import { sendOTPEmail } from "./nodemailer.js";
-
+import {redis,cacheSet, cacheGet, cacheDel} from '@repo/cache'
 
 interface  User{
   id:string;
@@ -57,13 +57,9 @@ const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
     
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); 
+    const otp = Math.floor(10000 + Math.random() * 90000).toString();
     
-    await prisma.user.update({
-      where: { email },
-      data: { otp, otpExpiry },
-    });
+    await cacheSet(`otp:${email}`, otp, 5 * 60);
     await sendOTPEmail(email, otp);
    
     return res.status(200).json({ message: "OTP sent to your email. Please verify to login." });
@@ -75,7 +71,6 @@ const login = async (req: Request, res: Response) => {
 const Signup = async (req: Request, res: Response) => {
   try {
     const { email, password, name ,role} = req.body;
-   (req.body);
     if (!email || !password || !name) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -124,22 +119,19 @@ const verifyOTP = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
     
-    if (!user.otpExpiry || user.otpExpiry < new Date()) {
-      return res.status(400).json({ message: "OTP expired" });
+    const storedOtp:string|null=await cacheGet<string>(`otp:${email}`);
+    if(storedOtp==undefined||null)
+    {
+      return res.status(400).json({ message: "OTP expired or not found" });
     }
-    if (!user.otp || user.otp !== otp) {
+    if(storedOtp!=otp)
+    {
       return res.status(400).json({ message: "Invalid OTP" });
     }
-    
 
-    // Update user to clear OTP
-    const updatedUser = await prisma.user.update({
-      where: { email },
-      data: { otp: null, otpExpiry: null },
-    });
-    
-    const access_token = getAccessToken(updatedUser);
-    const refresh_token = getRefereshToken(updatedUser);
+    await cacheDel(`otp:${email}`);
+    const access_token = getAccessToken(user);
+    const refresh_token = getRefereshToken(user);
     
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
