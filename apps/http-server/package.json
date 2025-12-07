@@ -6,18 +6,35 @@
   "type": "module",
   "scripts": {
     "build": "tsc -b",
-    "dev": "tsc -b && bun ./dist/index.js"
+    "dev": "tsc -b && bun ./dist/index.js",
+    "watch": "concurrently \"tsc -w\" \"bun --watch dist/index.js\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.19.0",
   "dependencies": {
+    "@types/cors": "^2.8.19",
+    "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
+    "concurrently": "^9.2.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "express": "^5.2.1",
+    "google-auth-library": "^10.5.0",
+    "googleapis": "^167.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^7.0.11",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@repo/database": "workspace:*",
+    "@repo/types": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/express": "^5.0.6"
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/nodemailer": "^7.0.4"
   }
 }

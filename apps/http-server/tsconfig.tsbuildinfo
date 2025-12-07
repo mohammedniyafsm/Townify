@@ -1,1 +1,1 @@
-{"root":["./src/index.ts"],"version":"5.9.3"}
+{"root":["./src/index.ts","./src/users/controller.ts","./src/users/googleconfig.ts","./src/users/middleware.ts","./src/users/nodemailer.ts","./src/users/routes.ts"],"version":"5.9.3"}

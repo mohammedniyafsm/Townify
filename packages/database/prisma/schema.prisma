@@ -13,8 +13,36 @@ datasource db {
   provider = "postgresql"
 }
 
+
+enum AuthProvider {
+  local
+  google
+  both
+}
+enum UserRole {
+  user
+  admin
+}
+
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id           String         @id @default(uuid())
+  email        String         @unique
+  name         String
+  password     String?        // nullable because Google users have no password
+  googleId     String?        // stored only for Google OAuth
+  authProvider AuthProvider   @default(local)  // enum
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  otp          String?
+  otpExpiry    DateTime?
+  profile      String?
+  role         UserRole       @default(user)  // enum
+  avatarId     String?
+  avatar       Avatar?       @relation("UserAvatar", fields: [avatarId], references: [id])
+}
+
+model Avatar {
+  id        String   @id @default(uuid())
+  name      String
+  user      User[]   @relation("UserAvatar")
 }
