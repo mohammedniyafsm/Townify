@@ -11,7 +11,7 @@ app.get('/',(req:Request,res:Response)=>{
 })
 
 app.use(cors({
-    origin:'*',
+    origin:'http://localhost:5173',
     credentials:true,
     allowedHeaders:['Content-Type','Authorization'],
     methods:['GET','POST','PUT','DELETE','OPTIONS'] 

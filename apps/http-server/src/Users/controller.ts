@@ -5,28 +5,28 @@ import { oAuthclient } from "./googleConfig.js";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import { sendOTPEmail } from "./nodemailer.js";
-import {redis,cacheSet, cacheGet, cacheDel} from '@repo/cache'
+import { redis, cacheSet, cacheGet, cacheDel } from '@repo/cache'
 
-interface  User{
-  id:string;
-  email:string;
-  role:string;  
+interface User {
+  id: string;
+  email: string;
+  role: string;
 }
 
-const getAccessToken=(user:User)=>{
+const getAccessToken = (user: User) => {
   return jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "1h" }
-    );
+    { userId: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET as string,
+    { expiresIn: "1h" }
+  );
 }
 
-const getRefereshToken=(user:User)=>{
+const getRefereshToken = (user: User) => {
   return jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      process.env.JWT_REFRESH_SECRET as string,
-      { expiresIn: "7d" }
-    );
+    { userId: user.id, email: user.email, role: user.role },
+    process.env.JWT_REFRESH_SECRET as string,
+    { expiresIn: "7d" }
+  );
 }
 
 
@@ -56,13 +56,13 @@ const login = async (req: Request, res: Response) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    
+
     const otp = Math.floor(10000 + Math.random() * 90000).toString();
-    
+
     await cacheSet(`otp:${email}`, otp, 5 * 60);
-    await cacheSet(`otp:timestamp:${email}`,Date.now().toString(),5*60)
+    await cacheSet(`otp:timestamp:${email}`, Date.now().toString(), 5 * 60)
     await sendOTPEmail(email, otp);
-   
+
     return res.status(200).json({ message: "OTP sent to your email. Please verify to login." });
   } catch (error) {
     console.error("Login error:", error);
@@ -71,28 +71,27 @@ const login = async (req: Request, res: Response) => {
 };
 const Signup = async (req: Request, res: Response) => {
   try {
-    const { email, password, name ,role} = req.body;
+    const { email, password, name } = req.body;
     if (!email || !password || !name) {
       return res.status(400).json({ message: "All fields are required" });
     }
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
-    
+
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
     }
-    
+
     const hashedPassword = await bcrypt.hash(password, 10);
     await prisma.user.create({
       data: {
         email: email.trim(),
         password: hashedPassword,
         name: name.trim(),
-        role: role=='admin'? role : "user",
       },
     });
-    
+
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
     console.error("Signup error:", error);
@@ -106,34 +105,32 @@ const Signup = async (req: Request, res: Response) => {
 const verifyOTP = async (req: Request, res: Response) => {
   try {
     const { email, otp } = req.body;
-    
+
     if (!email || !otp) {
       return res.status(400).json({ message: "Email and OTP are required" });
     }
-    
+
     // Find user without transaction first
     const user = await prisma.user.findUnique({
       where: { email },
     });
-    
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    
-    const storedOtp:string|null=await cacheGet<string>(`otp:${email}`);
-    if(storedOtp==undefined||null)
-    {
+
+    const storedOtp: string | null = await cacheGet<string>(`otp:${email}`);
+    if (storedOtp == undefined || null) {
       return res.status(400).json({ message: "OTP expired or not found" });
     }
-    if(storedOtp!=otp)
-    {
+    if (storedOtp != otp) {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
     await cacheDel(`otp:${email}`);
     const access_token = getAccessToken(user);
     const refresh_token = getRefereshToken(user);
-    
+
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -151,27 +148,29 @@ const verifyOTP = async (req: Request, res: Response) => {
   }
 };
 
-const resendOtp=async(req:Request,res:Response)=>{  
+const resendOtp = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
-    } 
-    const storedOtpTime=await cacheGet<string>(`otp:timestamp:${email}`);
-    if(storedOtpTime){
-      const elapsed=(Date.now()-parseInt(storedOtpTime))/1000;  
-      if(elapsed<60)
-      {
-        const minutesLeft=60-Math.floor(elapsed/60);
-        return res.status(400).json({message:`Resend Otp in ${minutesLeft} seconds`})
+    }
+    const storedOtpTime = await cacheGet<string>(`otp:timestamp:${email}`);
+    if (storedOtpTime) {
+      const elapsed = (Date.now() - parseInt(storedOtpTime)) / 1000;
+      if (elapsed < 60) {
+        const secondsLeft = Math.floor(60 - elapsed);
+        return res.status(400).json({
+          message: `Resend OTP in ${secondsLeft} seconds`,
+          seconds : secondsLeft
+        });
       }
     }
     const newOtp = Math.floor(10000 + Math.random() * 90000).toString();
-    await cacheSet(`otp:timestamp:${email}`,Date.now().toString(),5*60)
-    await cacheSet(`otp:${email}`,newOtp,5*60)
-    await sendOTPEmail(email,newOtp)
+    await cacheSet(`otp:timestamp:${email}`, Date.now().toString(), 5 * 60)
+    await cacheSet(`otp:${email}`, newOtp, 5 * 60)
+    await sendOTPEmail(email, newOtp)
 
-    res.status(200).json({message:"Otp resent"})
+    res.status(200).json({ message: "Otp resent" })
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
@@ -227,10 +226,10 @@ const googleLogin = async (req: Request, res: Response) => {
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    return res.status(200).json({ message: "Login successful", user,access_token });
+    return res.status(200).json({ message: "Login successful", user, access_token });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export { login, googleLogin, Signup, verifyOTP,resendOtp };
+export { login, googleLogin, Signup, verifyOTP, resendOtp };
