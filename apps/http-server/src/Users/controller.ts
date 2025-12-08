@@ -60,6 +60,7 @@ const login = async (req: Request, res: Response) => {
     const otp = Math.floor(10000 + Math.random() * 90000).toString();
     
     await cacheSet(`otp:${email}`, otp, 5 * 60);
+    await cacheSet(`otp:timestamp:${email}`,Date.now().toString(),5*60)
     await sendOTPEmail(email, otp);
    
     return res.status(200).json({ message: "OTP sent to your email. Please verify to login." });
@@ -150,6 +151,32 @@ const verifyOTP = async (req: Request, res: Response) => {
   }
 };
 
+const resendOtp=async(req:Request,res:Response)=>{  
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    } 
+    const storedOtpTime=await cacheGet<string>(`otp:timestamp:${email}`);
+    if(storedOtpTime){
+      const elapsed=(Date.now()-parseInt(storedOtpTime))/1000;  
+      if(elapsed<60)
+      {
+        const minutesLeft=60-Math.floor(elapsed/60);
+        return res.status(400).json({message:`Resend Otp in ${minutesLeft} seconds`})
+      }
+    }
+    const newOtp = Math.floor(10000 + Math.random() * 90000).toString();
+    await cacheSet(`otp:timestamp:${email}`,Date.now().toString(),5*60)
+    await cacheSet(`otp:${email}`,newOtp,5*60)
+    await sendOTPEmail(email,newOtp)
+
+    res.status(200).json({message:"Otp resent"})
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 const googleLogin = async (req: Request, res: Response) => {
   try {
     const { code } = req.query;
@@ -206,4 +233,4 @@ const googleLogin = async (req: Request, res: Response) => {
   }
 };
 
-export { login, googleLogin, Signup, verifyOTP };
+export { login, googleLogin, Signup, verifyOTP,resendOtp };
