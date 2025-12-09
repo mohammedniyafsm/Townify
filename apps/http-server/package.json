@@ -17,6 +17,7 @@
     "@types/cors": "^2.8.19",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.8.0",
     "concurrently": "^9.2.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -24,18 +25,21 @@
     "google-auth-library": "^10.5.0",
     "googleapis": "^167.0.0",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2",
     "nodemailer": "^7.0.11",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@repo/cache": "workspace:*",
     "@repo/database": "workspace:*",
     "@repo/types": "workspace:*",
-    "@repo/cache": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
+    "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
     "@types/nodemailer": "^7.0.4"
   }
 }
