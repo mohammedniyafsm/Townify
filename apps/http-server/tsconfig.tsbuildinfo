@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/users/controller.ts","./src/users/middleware.ts","./src/users/routes.ts","./src/lib/cloudinary.ts","./src/lib/googleconfig.ts","./src/lib/multer.ts","./src/lib/nodemailer.ts"],"version":"5.9.3"}
+{"root":["./src/index.ts","./src/Users/controller.ts","./src/Users/middleware.ts","./src/Users/routes.ts","./src/lib/cloudinary.ts","./src/lib/googleConfig.ts","./src/lib/multer.ts","./src/lib/nodemailer.ts"],"version":"5.9.3"}

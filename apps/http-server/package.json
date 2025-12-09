@@ -30,9 +30,10 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@repo/cache": "workspace:*",
     "@repo/database": "workspace:*",
     "@repo/types": "workspace:*",
+    "@repo/cache": "workspace:*",
+    "@repo/zod-schemas": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",

@@ -7,6 +7,8 @@ import jwt from "jsonwebtoken";
 import { sendOTPEmail } from "../lib/nodemailer.js";
 import {cacheSet, cacheGet, cacheDel} from '@repo/cache'
 import { uploadToCloudinary } from "src/lib/cloudinary.js";
+import { signupSchema, loginSchema } from "@repo/zod-schemas"
+
 
 interface  User{
   userId?:string;
@@ -47,6 +49,9 @@ const getRefereshToken=(user:User)=>{
 
 const login = async (req: Request, res: Response) => {
   try {
+    const parsed = loginSchema.safeParse(req.body);
+    console.log(parsed)
+    if (!parsed.success) return res.status(400).json(parsed.error);
     const { email, password } = req.body;
     if (!email || !password) {
       return res
@@ -86,6 +91,8 @@ const login = async (req: Request, res: Response) => {
 };
 const Signup = async (req: Request, res: Response) => {
   try {
+    const parsed = signupSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json(parsed.error);
     const { email, password, name } = req.body;
     if (!email || !password || !name) {
       return res.status(400).json({ message: "All fields are required" });
@@ -113,9 +120,6 @@ const Signup = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
-
 
 const verifyOTP = async (req: Request, res: Response) => {
   try {
@@ -176,7 +180,7 @@ const resendOtp = async (req: Request, res: Response) => {
         const secondsLeft = Math.floor(60 - elapsed);
         return res.status(400).json({
           message: `Resend OTP in ${secondsLeft} seconds`,
-          seconds : secondsLeft
+          seconds: secondsLeft
         });
       }
     }

@@ -13,109 +13,159 @@ import { BorderBeam } from "@/components/ui/border-beam"
 import LandingNav from "@/components/Landing-page/LandingNav"
 import { GoogleIcon } from "@/components/icons/google"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 import { loginUser } from "@/api/authApi"
 import { toast } from "sonner"
 import { useGoogleLogin } from "@react-oauth/google"
 import axios from "axios"
+import { loginSchema, type LoginInput } from "@repo/zod-schemas"
 
-
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 export function Login() {
+  const navigate = useNavigate()
 
-  const navigate = useNavigate();
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string | null>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+  })
 
-  const handleSubmit = async () => {
+  const onSubmit = async (data: LoginInput) => {
     try {
-      setLoading(true);
-      const response = await loginUser({ email, password });
-      console.log(response)
+      const response = await loginUser({
+        email: data.email,
+        password: data.password,
+      })
+
       if (response) {
-        setLoading(false);
-        toast.success("Please verify OTP to access your account.", {
-          // description: "Your account has been created.",
+        const email = data.email
+
+        toast.success("Login successful! Sending OTP...", {
           action: {
-            label: "OTP",
+            label: "Verify OTP",
             onClick: () => navigate("/auth/otp", { state: { email } }),
           },
-        });
+        })
+
+        localStorage.setItem("otpEmail", email)
+
         setTimeout(() => {
-          localStorage.setItem("otpEmail", email );
-          navigate('/auth/otp', { state: { email } });
-        }, 1000)
+          navigate("/auth/otp", { state: { email } })
+        }, 1200)
       }
-    } catch (error) {
-      setLoading(false);
-      console.log(error)
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Invalid credentials")
+      console.error(error)
     }
   }
 
   const responseGoogle = async (authResult: any) => {
     try {
-      if (authResult['code']) {
-        const response = await axios.get(`http://localhost:8080/auth/googleLogin?code=${authResult.code}`, { withCredentials: true })
-        navigate('/');
-        console.log(response)
+      if (authResult?.code) {
+        await axios.get(`http://localhost:8080/auth/googleLogin?code=${authResult.code}`, {
+          withCredentials: true,
+        })
+        toast.success("Logged in with Google!")
+        navigate("/")
       }
-    } catch (error) {
-      console.error('Error while requisting google code', error)
+    } catch (error: any) {
+      toast.error("Google login failed")
+      console.error(error)
     }
   }
 
-  const GoogleLogin = useGoogleLogin({
+  const googleLogin = useGoogleLogin({
     onSuccess: responseGoogle,
     onError: responseGoogle,
-    flow: 'auth-code'
+    flow: "auth-code",
   })
 
   return (
-
-    <div className="">
-
+    <div>
       <LandingNav />
 
-      <div className=" flex justify-center h-screen items-center">
-        <Card className="relative w-[350px] overflow-hidden">
-          <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>
-              Enter your credentials to access your account.
-            </CardDescription>
+      <div className="flex justify-center items-center h-screen">
+        <Card className="relative w-[380px] overflow-hidden mt-6">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Welcome Back</CardTitle>
+            <CardDescription>Log in to your Townify account</CardDescription>
           </CardHeader>
+
           <CardContent>
-            <form onSubmit={(e) => { e.preventDefault(); handleSubmit() }}>
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="email">Email</Label>
-                  <Input onChange={(e) => setEmail(e.target.value)}
-                    id="email" type="email" placeholder="Enter your email" />
-                </div>
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    onChange={(e) => setPassword(e.target.value)}
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                  />
-                </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  {...register("email")}
+                />
+                {errors.email && (
+                  <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
+                )}
               </div>
-              {loading ?
-                <Button className="w-full cursor-pointer mt-4"> <Spinner />  Logging in...</Button>
-                : <Button type={"submit"} className="w-full cursor-pointer mt-4">Login</Button>
-              }
+
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  {...register("password")}
+                />
+                {errors.password && (
+                  <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+                )}
+              </div>
+
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Spinner className="mr-2 h-4 w-4" />
+                    Logging in...
+                  </>
+                ) : (
+                  "Log In"
+                )}
+              </Button>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col gap-2" >
-            <Button onClick={() => GoogleLogin()} variant={"outline"} className="w-full cursor-pointer"> <GoogleIcon /> Login With Google</Button>
-            <h1 className="text-sm">Don’t Have an Account Already ?</h1>
-            <h1 onClick={() => navigate('/signup')} className="underline hover:text-gray-500 cursor-pointer text-xs">Sign Up</h1>
+
+          <CardFooter className="flex flex-col gap-4">
+            <div className="relative w-full">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <Button onClick={() => googleLogin()} variant="outline" className="w-full">
+              <GoogleIcon className="mr-2 h-5 w-5" />
+              Continue with Google
+            </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/signup")}
+                className="font-medium underline underline-offset-4 hover:text-primary"
+              >
+                Sign up
+              </button>
+            </p>
           </CardFooter>
-          <BorderBeam duration={8} size={100} />
+
+          <BorderBeam duration={10} />
         </Card>
       </div>
     </div>
