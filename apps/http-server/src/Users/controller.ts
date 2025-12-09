@@ -1,27 +1,42 @@
 import type { Request, Response } from "express";
 import { prisma } from "@repo/database";
 import bcrypt from "bcrypt";
-import { oAuthclient } from "./googleConfig.js";
+import { oAuthclient } from "../lib/googleConfig.js";
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import { sendOTPEmail } from "./nodemailer.js";
-import { redis, cacheSet, cacheGet, cacheDel } from '@repo/cache'
+import { sendOTPEmail } from "../lib/nodemailer.js";
+import {cacheSet, cacheGet, cacheDel} from '@repo/cache'
+import { uploadToCloudinary } from "src/lib/cloudinary.js";
 
-interface User {
+interface  User{
+  userId?:string;
+  id:string;
+  email:string;
+  role:string;  
+}
+
+interface Avatar{
   id: string;
-  email: string;
-  role: string;
+  name: string;
 }
 
-const getAccessToken = (user: User) => {
-  return jwt.sign(
-    { userId: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET as string,
-    { expiresIn: "1h" }
-  );
+interface UserSchema{
+    id: string;
+    email: string;
+    name: string;
+    password: string | null;
+    googleId: string | null;
+    authProvider: string;
+    createdAt: Date;
+    updatedAt: Date;
+    profile: string | null;
+    role: 'user' | 'admin' | string;
+    avatarId: string | null;
+    avatar?: Avatar;
 }
 
-const getRefereshToken = (user: User) => {
+
+const getRefereshToken=(user:User)=>{
   return jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
     process.env.JWT_REFRESH_SECRET as string,
@@ -111,16 +126,18 @@ const verifyOTP = async (req: Request, res: Response) => {
     }
 
     // Find user without transaction first
-    const user = await prisma.user.findUnique({
+    const user= await prisma.user.findUnique({
       where: { email },
+      include: { avatar: true }
     });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    const storedOtp: string | null = await cacheGet<string>(`otp:${email}`);
-    if (storedOtp == undefined || null) {
+    
+    const storedOtp:string|null=await cacheGet<string>(`otp:${email}`);
+    if(!storedOtp)
+    {
       return res.status(400).json({ message: "OTP expired or not found" });
     }
     if (storedOtp != otp) {
@@ -128,7 +145,6 @@ const verifyOTP = async (req: Request, res: Response) => {
     }
 
     await cacheDel(`otp:${email}`);
-    const access_token = getAccessToken(user);
     const refresh_token = getRefereshToken(user);
 
     res.cookie("refresh_token", refresh_token, {
@@ -139,8 +155,7 @@ const verifyOTP = async (req: Request, res: Response) => {
     });
 
     return res.status(200).json({
-      message: "OTP verified successfully",
-      access_token: access_token,
+      message: "OTP verified successfully",user
     });
   } catch (error) {
     console.error("OTP verification error:", error);
@@ -196,6 +211,7 @@ const googleLogin = async (req: Request, res: Response) => {
     const googleUser = userRes.data;
     let user = await prisma.user.findUnique({
       where: { email: googleUser.email },
+      include: { avatar: true }
     });
     if (!user) {
       user = await prisma.user.create({
@@ -206,19 +222,11 @@ const googleLogin = async (req: Request, res: Response) => {
           authProvider: "google",
           googleId: googleUser.id,
         },
+        include: { avatar: true }
       });
     }
-    const access_token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "1h" }
-    );
 
-    const refresh_token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      process.env.JWT_REFRESH_SECRET as string,
-      { expiresIn: "7d" }
-    );
+    const refresh_token = getRefereshToken(user);
 
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
@@ -226,10 +234,62 @@ const googleLogin = async (req: Request, res: Response) => {
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    return res.status(200).json({ message: "Login successful", user, access_token });
+    return res.status(200).json({ message: "Login successful",user });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export { login, googleLogin, Signup, verifyOTP, resendOtp };
+const logOut=async(req:Request,res:Response)=>{
+  try {
+    res.clearCookie("refresh_token", {    
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",  
+    });
+    res.status(200).json({message:"Logged out"})
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+const updateUserProfile=async(req:Request,res:Response)=>{
+  try {
+    const userId=req.user?.userId;
+    const {name,avatarId}:{name:string,avatarId:string}=req.body;
+    const profile=req.file
+    const user=await prisma.user.findUnique({where:{id:userId||''}})
+    if(name.length<1)
+    {
+      return res.status(400).json({message:"Name cannot be empty"})
+    }
+    const updatedData:{name?:string,profile?:string,avatarId?:string|null}={}
+    if(!user)
+    {
+      return res.status(404).json({message:"User not found"})
+    }
+    if(profile)
+    {
+      const {result,success,error}=await uploadToCloudinary(profile.path,{folder:"townify/users"})
+      if(!success)
+      {
+        return res.status(500).json({message:"User update failed",error})
+      }
+      updatedData.profile= result?.secure_url||''
+    }
+    updatedData.name=name.trim()||user.name
+    updatedData.avatarId=avatarId||user.avatarId
+
+    const updatedUser=await prisma.user.update({
+      where:{id:userId||''},
+      data:updatedData,
+      include:{avatar:true}
+    })
+    res.status(200).json({message:"User updated successfully",user:updatedUser})
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
+export { login, googleLogin, Signup, verifyOTP,resendOtp,logOut,updateUserProfile };
