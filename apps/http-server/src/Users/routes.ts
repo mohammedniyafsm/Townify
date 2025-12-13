@@ -1,6 +1,6 @@
 import express,{ Router, type Request, type Response} from "express"
 import { getUser, googleLogin, login, logOut, resendOtp, Signup, updateUserProfile, verifyOTP } from "./controller.js";
-import { userMiddleware } from "./middleware.js";
+import { userMiddleware } from "../lib/middleware.js";
 import { imageUpload } from "src/lib/multer.js";
 
 const router:Router =express.Router()
