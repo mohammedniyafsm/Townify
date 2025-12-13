@@ -1,18 +1,25 @@
 import type { Request } from 'express';
 import multer from 'multer';
+import fs from 'fs'
+import path from 'path'
 // import dotenv from 'dotenv';
 // dotenv.config();
 
-const storage=multer.diskStorage({
-    destination:function(req,file,cb)
-    {
-        cb(null,'./uploads/')
-    },
-    filename:function(req,file,cb)
-    {
-        cb(null,file.originalname+'_'+Date.now())
+const uploadDir = path.resolve(process.cwd(), "uploads");
+
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
     }
-})
+    cb(null, uploadDir);
+  },
+
+  filename(req, file, cb) {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
+  },
+});
 
 function fileFilter(req:Request ,file:Express.Multer.File, cb:multer.FileFilterCallback) {
   const allowedType = (process.env.ALLOWED_IMAGE_TYPES||'').split(",").filter(Boolean);
