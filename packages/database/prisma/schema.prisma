@@ -43,9 +43,5 @@ model Avatar {
   id    String @id @default(uuid())
   name  String
   user  User[] @relation("UserAvatar")
-  idle  String
-  up    String
-  down  String
-  left  String
-  right String
+  walkSheet String
 }

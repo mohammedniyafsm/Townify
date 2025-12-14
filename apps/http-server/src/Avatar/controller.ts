@@ -12,34 +12,27 @@ function avatarUpload(path:string){
 const uploadAvatar=async(req:Request,res:Response)=>{
     try {
         const {name}=req.body;
-        const up=(req.files as { [fieldname: string]: Express.Multer.File[] })?.up?.[0]
-        const down=(req.files as { [fieldname: string]: Express.Multer.File[] })?.down?.[0]
-        const left=(req.files as { [fieldname: string]: Express.Multer.File[] })?.left?.[0]
-        const right=(req.files as { [fieldname: string]: Express.Multer.File[] })?.right?.[0]
-        const idle=(req.files as { [fieldname: string]: Express.Multer.File[] })?.idle?.[0]
-        if (!up || !down || !left || !right||!idle) {
-            return res.status(400).json({ message: "All five avatar images (up, down, left, right,idle) are required" });
+        const walkSheet=req.file;
+        
+        if (!walkSheet) {
+            return res.status(400).json({ message: "WalkSheet image is required" });
         }
-        const [upUrl,downUrl,leftUrl,rightUrl,idleUrl]=await Promise.all([
-            avatarUpload(up.path),
-            avatarUpload(down.path),
-            avatarUpload(left.path),
-            avatarUpload(right.path),
-            avatarUpload(idle.path)
-        ])
 
-        if (!upUrl.success || !downUrl.success || !leftUrl.success || !rightUrl.success) {
-            return res.status(500).json({ message: "Failed to upload one or more avatar images" });
+        if (!name || name.trim().length === 0) {
+            return res.status(400).json({ message: "Avatar name is required" });
         }
-        await cacheDel('avatars:list')
+
+        const uploadResult = await avatarUpload(walkSheet.path);
+
+        if (!uploadResult.success) {
+            return res.status(500).json({ message: "Failed to upload walkSheet image" });
+        }
+
+        await cacheDel('avatars:list');
         const avatar=await prisma.avatar.create({
             data:{
-                name:name,
-                up:upUrl.result?.secure_url || "",
-                down:downUrl.result?.secure_url || "",
-                left:leftUrl.result?.secure_url || "",
-                right:rightUrl.result?.secure_url || "",
-                idle:idleUrl.result?.secure_url||""
+                name: name.trim(),
+                walkSheet: uploadResult.result?.secure_url || ""
             }
         })
         res.status(200).json({message:"Avatar uploaded successfully",avatar})
@@ -120,30 +113,27 @@ const updateAvatar=async(req:Request,res:Response)=>{
             return res.status(400).json({ message: "Avatar ID is required" });
         }
         const {name}=req.body;
-        const up=(req.files as { [fieldname: string]: Express.Multer.File[] })?.up?.[0]
-        const down=(req.files as { [fieldname: string]: Express.Multer.File[] })?.down?.[0]
-        const left=(req.files as { [fieldname: string]: Express.Multer.File[] })?.left?.[0]
-        const right=(req.files as { [fieldname: string]: Express.Multer.File[] })?.right?.[0]
-        const idle=(req.files as { [fieldname: string]: Express.Multer.File[] })?.idle?.[0]
+        const walkSheet=req.file;
+
         const updateData: any = {};
-        if (name) updateData.name = name;
-
-        const uploads = [];
-        if (up) uploads.push(avatarUpload(up.path).then(result => ({ key: 'up', ...result })));
-        if (down) uploads.push(avatarUpload(down.path).then(result => ({ key: 'down', ...result })));
-        if (left) uploads.push(avatarUpload(left.path).then(result => ({ key: 'left', ...result })));
-        if (right) uploads.push(avatarUpload(right.path).then(result => ({ key: 'right', ...result })));
-        if (idle) uploads.push(avatarUpload(idle.path).then(result => ({ key: 'idle', ...result })));
-
-        const results = await Promise.all(uploads);
-        for (const result of results) {
-            if (!result.success) {
-                return res.status(500).json({ message: `Failed to upload ${result.key} image` });
-            }
-            updateData[result.key] = result.result?.secure_url || "";
+        if (name && name.trim().length > 0) {
+            updateData.name = name.trim();
         }
 
-        await cacheDel('avatars:list')
+        if (walkSheet) {
+            const uploadResult = await avatarUpload(walkSheet.path);
+            if (!uploadResult.success) {
+                return res.status(500).json({ message: "Failed to upload walkSheet image" });
+            }
+            updateData.walkSheet = uploadResult.result?.secure_url || "";
+        }
+
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ message: "No valid update data provided" });
+        }
+
+        await cacheDel('avatars:list');
+        await cacheDel(`avatars:${id}`);
         const avatar = await prisma.avatar.update({
             where: { id },
             data: updateData
