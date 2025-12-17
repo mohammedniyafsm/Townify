@@ -58,7 +58,7 @@ import { LogoutApi } from "@/api/authApi";
             :
             <Button onClick={() => navigate('/login')} variant="outline">Login</Button>
           }
-            <RainbowButton>Get Started</RainbowButton>
+            <RainbowButton onClick={()=>navigate('/app')}>Get Started</RainbowButton>
           </div>
 
           {/* Mobile Menu Button */}
