@@ -1,5 +1,8 @@
-import fs from 'fs'
 import {v2 as cloudinary} from 'cloudinary'
+import dotenv from "dotenv";
+import fs from 'fs'
+
+dotenv.config();
 
 const cloud_name= process.env.CLOUD_NAME as string
 const api_key= process.env.CLOUD_API as string
@@ -10,15 +13,13 @@ cloudinary.config({
   api_secret: api_secret,
 });
 
-const uploadToCloudinary = async (filePath:string, option = {}) => {
+const uploadToCloudinary = async (filePath: string, option = {}) => {
   try {
     const result = await cloudinary.uploader.upload(filePath, {
       ...option,
     });
-    fs.unlinkSync(filePath);
     return { success: true, result };
   } catch (error) {
-    fs.unlinkSync(filePath);
     return { success: false, error };
   }
 };
@@ -28,7 +29,7 @@ const deleteFromCloudinary=async(public_id:string,option={})=>{
     const result=await cloudinary.uploader.destroy(public_id,option)
     return {result,success:true}
   } catch (error) {
-    return {error,success:false}
+    return {error,success:false}  
   }
 }
 
