@@ -45,3 +45,12 @@ model Avatar {
   user  User[] @relation("UserAvatar")
   walkSheet String
 }
+
+
+model Map{
+  id String @id @default(uuid())
+  name String
+  thumbnail String
+  thumbnailId String
+  configJson Json
+}
