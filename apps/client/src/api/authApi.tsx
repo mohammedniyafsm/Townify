@@ -35,3 +35,7 @@ export const updateUserApi=async(data:FormData)=>
   return axiosInstance.patch("/auth/user",data)
 }
 
+export const fetchAllRoomTemplate=async()=>{
+  return await axiosInstance.get("/map");
+}
+

@@ -18,6 +18,7 @@ const AuthSlice=createSlice({
     initialState:intialState,
     reducers:{
         addAuth:(state,action)=>{
+            state.status="succeeded"
             state.user=action.payload
         },
         removeAuth:(state)=>{
