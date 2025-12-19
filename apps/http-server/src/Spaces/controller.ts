@@ -1,5 +1,6 @@
 import { prisma } from "@repo/database"
 import type { Request, Response } from "express"
+import { sendInvitationEmail } from "src/lib/nodemailer.js"
 
 
 const createSpace=async(req:Request,res:Response)=>{
@@ -243,4 +244,35 @@ const blockUserInSpace=async(req:Request,res:Response)=>{
     }
 }
 
-export {createSpace,getSpace,updateSpace,joinSpace,deleteSpace,leaveSpace,blockUserInSpace,getSpaceByUser}
+const sendInvitationToSpace=async(req:Request,res:Response)=>{
+    try {
+        const {slug,email,url}:{slug:string,email:string[],url:string}=req.body 
+        if(!slug||slug.trim().length===0)
+        {
+            return res.status(400).json({message:"Space slug is required"})
+        }
+        if(!email||email.length===0)
+        {
+            return res.status(400).json({message:"At least one email is required"})
+        }
+        if (!url) {
+            return res.status(400).json({message:"URL is required"})
+        }
+        const space=await prisma.space.findUnique({
+            where:{
+                slug:slug||""   
+            }       
+        })
+        if(!space)
+        {
+            return res.status(404).json({message:"Space not found"})
+        }
+        let sendEmails=email.map((e)=>sendInvitationEmail(e.trim(),space.name,req.user?.email||"",url+'/'+slug))
+         await Promise.all(sendEmails)
+        res.status(200).json({message:"Invitation sent successfully"})
+    } catch (error) {
+        res.status(500).json({message:"Internal server error"})
+    }   
+}
+
+export {createSpace,getSpace,updateSpace,joinSpace,deleteSpace,leaveSpace,blockUserInSpace,getSpaceByUser,sendInvitationToSpace}
