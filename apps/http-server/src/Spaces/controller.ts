@@ -118,6 +118,25 @@ const getSpace=async(req:Request,res:Response)=>{
 }
 
 
+const getSpaceByUser=async(req:Request,res:Response)=>{
+    try {
+        const userId=req.user?.userId
+        const space=await prisma.space.findMany({
+            where:{
+                creatorId:userId||""
+            },
+            include:{
+                spaceMembers:true,
+                map:true
+            }
+        })
+        res.status(200).json({message:"Space fetched successfully",space})
+    } catch (error) {
+        res.status(500).json({message:"Internal server error"})
+    }
+}
+
+
 const joinSpace=async(req:Request,res:Response)=>{
     try {
     const userId=req.user?.userId
@@ -224,4 +243,4 @@ const blockUserInSpace=async(req:Request,res:Response)=>{
     }
 }
 
-export {createSpace,getSpace,updateSpace,joinSpace,deleteSpace,leaveSpace,blockUserInSpace}
+export {createSpace,getSpace,updateSpace,joinSpace,deleteSpace,leaveSpace,blockUserInSpace,getSpaceByUser}
