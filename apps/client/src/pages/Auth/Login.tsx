@@ -62,7 +62,8 @@ export function Login() {
         }, 1200)
       }
     } catch (error: any) {
-      toast.error(error.message||error?.response?.data?.message || "Invalid credentials")
+      console.log(error,"csdcsdvcds");
+      toast.error(error?.response?.data?.message || error.message || "Invalid credentials")
       console.error(error)
     }
   }

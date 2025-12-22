@@ -8,12 +8,12 @@ function Dashboard() {
   const [JoinRoom, setJoinRoom] = useState<boolean>(false);
 
   return (
-    <div>
+    <div className="">
       <DashbaordNav
         setJoinRoom={setJoinRoom}
         setCreateRoom={setCreateRoom}
       />
-      <div className="min-h-screen w-full bg-[#f8fafc] relative">
+      <div className="min-h-screen w-full bg-[#f8fafc] relative pb-30">
         {/* Soft Morning Mist Background */}
         <div
           className="absolute inset-0 z-0"

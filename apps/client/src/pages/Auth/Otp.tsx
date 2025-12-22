@@ -24,7 +24,7 @@ export function OTP() {
 
     const navigate = useNavigate()
     const location = useLocation();
-    const dispatch=useDispatch<AppDispatch>()
+    const dispatch = useDispatch<AppDispatch>()
     const emailFromState = location.state?.email;
     const [sendOtp, setsendOtp] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -64,7 +64,7 @@ export function OTP() {
     const handleSubmit = async (e: React.FormEvent) => {
         try {
             e.preventDefault();
-           
+
             const otp = getOTP();
             console.log("OTP Entered:", otp);
 
@@ -88,8 +88,9 @@ export function OTP() {
                     navigate("/");
                 }, 2000);
             }
-        } catch (error) {
+        } catch (error : any) {
             setLoading(false);
+            toast.error(error?.response?.data?.message || error.message || "Invalid OTP or Expired")
             console.log(error)
         }
     };
@@ -98,8 +99,8 @@ export function OTP() {
     const resendOtp = async () => {
         try {
             const response = await resendOtpApi({ email });
-
-            if (response.status === 200) {
+            console.log(response)
+            if (response.status === 202) {
                 toast.success("OTP sent successfully!");
 
                 setsendOtp(true);
@@ -107,13 +108,12 @@ export function OTP() {
             } else {
                 toast.error(response.data.message);
             }
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            console.log(error);
+            toast.error(error?.response?.data?.message || error.message )
             toast.error("Something went wrong");
         }
     };
-
-
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const value = e.target.value
