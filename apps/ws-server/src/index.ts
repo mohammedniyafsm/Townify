@@ -1,11 +1,23 @@
-import express, { type Request, type Response } from "express";
+import { createServer } from "http";
+import  { WebSocketServer } from "ws"
+import { handleDisconnect, handleMessage } from "./handlers.js";
+import type WebSocket from "ws";
 
-const app = express();
 
-app.get('/',(req:Request,res:Response)=>{
-    res.send("Server Running at 8081");
+const server = createServer();
+
+server.listen('3008',()=>{
+    console.log("Server Listing at 3008");
 })
 
-app.listen(8081,()=>{
-    console.log("Server Listinig at 8081");
+
+const wss = new WebSocketServer({server});
+
+wss.on('connection',(ws : WebSocket)=>{
+
+    (ws as any).isAlive = true;
+
+    ws.on('message',(message : any)=>handleMessage(ws,message));
+
+    ws.on('close',()=>handleDisconnect(ws));
 })

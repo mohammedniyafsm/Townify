@@ -1,0 +1,10 @@
+{
+  "extends": "../typescript-config/backend.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "declaration": true,
+    "types": ["node"]
+  },
+  "include": ["src"]
+}
