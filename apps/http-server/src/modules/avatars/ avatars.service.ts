@@ -13,19 +13,26 @@ const avatarUpload = (path: string) =>
 
 export const uploadAvatarService = async (
   name: string,
-  walkSheet: Express.Multer.File
+  walkSheet?: Express.Multer.File,
+  idle?:Express.Multer.File
 ) => {
   if (!name.trim()) throw new Error("INVALID_NAME");
   if (!walkSheet) throw new Error("MISSING_WALKSHEET");
+  if(!idle) throw new Error("MISSING_IDLE");
 
-  const uploadResult = await avatarUpload(walkSheet.path);
-  if (!uploadResult.success) throw new Error("UPLOAD_FAILED");
-
+  const [walkSheetURL,idleURL] = await Promise.all([
+    avatarUpload(walkSheet.path),
+    avatarUpload(idle.path)
+  ]);
+  if (!idleURL.success||!walkSheetURL.success) throw new Error("UPLOAD_FAILED");
+ 
+  
   await cacheDel("avatars:list");
 
   return createAvatarRepo({
     name: name.trim(),
-    walkSheet: uploadResult.result?.secure_url || "",
+    walkSheet: walkSheetURL.result?.secure_url || "",
+    idle: idleURL.result?.secure_url || "",
   });
 };
 
@@ -44,13 +51,19 @@ export const fetchAvatarService = async (id: string) => {
 export const updateAvatarService = async (
   id: string,
   name?: string,
-  walkSheet?: Express.Multer.File
+  walkSheet?: Express.Multer.File,
+  idle?:Express.Multer.File
 ) => {
   const avatar = await getAvatarByIdRepo(id);
   if (!avatar) throw new Error("AVATAR_NOT_FOUND");
 
   const data: any = {};
   if (name?.trim()) data.name = name.trim();
+  if (idle) {
+    const uploadResult = await avatarUpload(idle.path);
+    if (!uploadResult.success) throw new Error("UPLOAD_FAILED");
+    data.idle = uploadResult.result?.secure_url;
+  }
 
   if (walkSheet) {
     const uploadResult = await avatarUpload(walkSheet.path);

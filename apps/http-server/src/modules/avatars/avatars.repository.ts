@@ -3,6 +3,7 @@ import { prisma } from "@repo/database";
 export const createAvatarRepo = (data: {
   name: string;
   walkSheet: string;
+  idle:string;
 }) => {
   return prisma.avatar.create({ data });
 };

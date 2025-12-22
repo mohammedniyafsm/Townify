@@ -15,7 +15,7 @@ import {
 } from "./avatars.controller.js";
 import { imageUpload } from "../../shared/services/multer.service.js";
 
-const router = Router();
+const router:Router = Router();
 
 /**
  * @swagger
@@ -24,11 +24,18 @@ const router = Router();
  *     summary: Upload a new avatar
  *     tags: [Avatars]
  */
-router.post("/", imageUpload.single("walkSheet"), uploadAvatar);
+
+const avatarUpload=()=>{
+  return imageUpload.fields([
+    {name: 'walkSheet', maxCount: 1},
+   { name: 'idle', maxCount: 1}
+  ])
+}
+router.post("/", avatarUpload(), uploadAvatar);
 
 router.get("/", fetchAllAvatar);
 router.get("/:id", fetchAvatar);
-router.patch("/:id", imageUpload.single("walkSheet"), updateAvatar);
+router.patch("/:id", avatarUpload(), updateAvatar);
 router.delete("/:id", deleteAvatar);
 
 export default router;

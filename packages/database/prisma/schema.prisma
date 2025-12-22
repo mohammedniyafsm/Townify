@@ -31,6 +31,7 @@ model User {
   password     String? // nullable because Google users have no password
   googleId     String? // stored only for Google OAuth
   authProvider AuthProvider @default(local) // enum
+  isActive     Boolean      @default(true)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   profile      String?
@@ -46,6 +47,7 @@ model Avatar {
   id    String @id @default(uuid())
   name  String
   user  User[] @relation("UserAvatar")
+  idle   String
   walkSheet String
 }
 

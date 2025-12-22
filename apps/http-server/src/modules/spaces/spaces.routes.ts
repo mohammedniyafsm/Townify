@@ -18,7 +18,7 @@ import {
   getUserSpaces,
 } from "./spaces.controller.js";
 
-const router = Router();
+const router:Router = Router();
 
 /**
  * @swagger

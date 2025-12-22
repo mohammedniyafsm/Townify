@@ -15,7 +15,7 @@ import {
 } from "./maps.controller.js";
 import { mapUpload } from "../../shared/services/multer.service.js";
 
-const router = Router();
+const router:Router = Router();
 
 const mapMulter = mapUpload.fields([
   { name: "thumbnail", maxCount: 1 },

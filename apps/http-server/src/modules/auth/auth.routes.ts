@@ -15,7 +15,7 @@ import {
   resendOtp,
 } from "./auth.controller.js";
 
-const router = Router();
+const router:Router = Router();
 
 /**
  * @swagger
