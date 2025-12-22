@@ -1,10 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import AuthSlice from "./Slice/Auth/Auth";
+import AvatarSlice from "./Slice/Avatars/AvatarSlice";
+
 
 
 const store=configureStore({
     reducer:{
-        user:AuthSlice
+        user:AuthSlice,
+        avatars:AvatarSlice
     }
 })
 

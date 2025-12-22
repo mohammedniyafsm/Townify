@@ -1,8 +1,10 @@
 
 
-export interface AvatarShema{
+export interface AvatarSchema{
   id: string;
   name: string;
+  idle:string;
+  walkSheet: string;
 }
 
 export interface spaceI {
@@ -20,10 +22,20 @@ export interface UserSchema{
     password?: string | null;
     googleId: string | null;
     authProvider: string;
+    isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
     profile: string | null;
     role: 'user' | 'admin' | string;
     avatarId: string | null;
-    avatar?: AvatarShema;
+    avatar?: AvatarSchema;
+}
+
+
+export interface MapSchema{
+    id: string;
+    name: string;
+    thumbnail: string;
+    configJson: JSON;
+    spaces: spaceI[];
 }

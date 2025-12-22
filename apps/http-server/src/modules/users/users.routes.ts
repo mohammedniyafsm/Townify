@@ -10,7 +10,7 @@ import { getUser, updateUserProfile } from "./users.controller.js";
 import { userMiddleware } from "../../shared/middleware/auth.middleware.js";
 import { imageUpload } from "../../shared/services/multer.service.js";
 
-const router = Router();
+const router:Router = Router();
 
 /**
  * @swagger
