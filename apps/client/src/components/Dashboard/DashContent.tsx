@@ -23,8 +23,7 @@ function DashContent({ CreateRoom, setCreateRoom, JoinRoom, setJoinRoom }: Dashb
       try {
         setLoading(true);
         const response = await FetchUsersMap();
-        console.log(response.data.space);
-        setuserMap(response.data.space);
+        setuserMap(response.data.spaces || [] );
         setLoading(false);
       } catch (error) {
         setLoading(false);
