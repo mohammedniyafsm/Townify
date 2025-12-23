@@ -51,7 +51,7 @@ function App() {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/app" element={<Dashboard />} />
             <Route path="/invite/:slug" element={<InviteMembers />} />
-            <Route path="/lobby" element={<RoomLobby />} />
+            <Route path="/lobby/:slug" element={<RoomLobby />} />
             <Route path="/admin" element={<AdminSideBar/>}>
                   <Route index element={<AdminDashboard />} />
                   <Route path="maps" element={<Maps />} />

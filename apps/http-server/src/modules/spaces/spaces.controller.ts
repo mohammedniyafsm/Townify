@@ -8,6 +8,7 @@ import {
   blockUserService,
   sendInvitationService,
   getUserSpacesService,
+  findSpaceBySlugService,
 } from "./spaces.service.js";
 
 export const createSpace = async (req: Request, res: Response) => {
@@ -25,8 +26,8 @@ export const createSpace = async (req: Request, res: Response) => {
 
 export const updateSpace = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params ;
-    const { name,mapId } = req.body ;
+    const { id } = req.params;
+    const { name, mapId } = req.body;
     const space = await updateSpaceService(
       id as string,
       name,
@@ -99,3 +100,13 @@ export const getUserSpaces = async (req: Request, res: Response) => {
   const spaces = await getUserSpacesService(req.user!.userId);
   res.json({ spaces });
 };
+
+export const findSpaceBySlug = async (req: Request, res: Response) => {
+  try {
+    const { slug } = req.params;
+    const space = await findSpaceBySlugService(slug as string);
+    res.json({space});
+  } catch (error: any) {
+    res.status(500).json(error);
+  }
+}

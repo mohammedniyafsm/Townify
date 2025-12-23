@@ -15,10 +15,6 @@ export const findSpaceById = (id: string) => {
   });
 };
 
-export const findSpaceBySlug = (slug: string) => {
-  return prisma.space.findUnique({ where: { slug } });
-};
-
 export const updateSpaceRepo = (id: string, data: any) => {
   return prisma.space.update({
     where: { id },
@@ -62,4 +58,8 @@ export const blockMember = (id: string) => {
     where: { id },
     data: { isActive: false },
   });
+};
+
+export const findSpaceBySlug = (slug: string) => {
+  return prisma.space.findUnique({ where: { slug } });
 };

@@ -23,7 +23,6 @@ export const uploadAvatar = async (req: Request, res: Response) => {
 
 export const fetchAllAvatar = async (_: Request, res: Response) => {
   const avatars = await fetchAllAvatarsService();
-  console.log("Fetched avatars:", avatars);
   res.json({ avatars });
 };
 

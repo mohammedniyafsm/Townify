@@ -27,3 +27,7 @@ export const InviteUsers = async(slug : string,email:string[],url : string)=>{
     url
   })
 }
+
+export const findSpaceBySlug = async(slug : string) =>{
+  return await axiosInstance.get(`/spaces/${slug}`)
+}

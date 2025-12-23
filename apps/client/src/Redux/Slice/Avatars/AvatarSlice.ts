@@ -39,14 +39,14 @@ const AvatarSlice = createSlice({
         })
 
         .addCase(updateAvatar.fulfilled,(state,action)=>{
-            const index=state.avatars.findIndex(avatar=>avatar.id===action.payload.avatar.id);
+            const index=state.avatars.findIndex((avatar : any)=>avatar.id===action.payload.avatar.id);
             if(index!==-1){
                 state.avatars[index]=action.payload.avatar;
             }       
         })
 
         .addCase(deleteAvatar.fulfilled,(state,action)=>{
-            state.avatars=state.avatars.filter(avatar=>avatar.id!==action.payload.id);
+            state.avatars=state.avatars.filter((avatar : any)=>avatar.id!==action.payload.id);
         })
     }
 })

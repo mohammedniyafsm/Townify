@@ -103,3 +103,7 @@ export const sendInvitationService = async (
 export const getUserSpacesService = async (userId: string) => {
   return getSpacesByUser(userId);
 };
+
+export const findSpaceBySlugService = async (slug:string)=>{
+  return findSpaceBySlug(slug);
+}

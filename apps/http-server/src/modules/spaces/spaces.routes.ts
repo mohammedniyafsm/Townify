@@ -16,6 +16,7 @@ import {
   blockUser,
   sendInvitation,
   getUserSpaces,
+  findSpaceBySlug,
 } from "./spaces.controller.js";
 
 const router:Router = Router();
@@ -30,6 +31,7 @@ const router:Router = Router();
 router.post("/", userMiddleware, createSpace);
 
 router.get("/user", userMiddleware, getUserSpaces);
+router.get("/:slug", userMiddleware, findSpaceBySlug);
 router.post("/join/:slug", userMiddleware, joinSpace);
 router.post("/leave/:slug", userMiddleware, leaveSpace);
 router.post("/block/:slug/:userIdToBlock", userMiddleware, blockUser);
