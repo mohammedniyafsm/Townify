@@ -24,14 +24,15 @@ export const uploadAvatar = async (req: Request, res: Response) => {
 export const fetchAllAvatar = async (_: Request, res: Response) => {
   const avatars = await fetchAllAvatarsService();
   res.json({ avatars });
-};
+}; 
+
 
 export const fetchAvatar = async (req: Request, res: Response) => {
   try {
     const avatar = await fetchAvatarService(req.params.id as string);
     res.json({ avatars: avatar });
   } catch {
-    res.status(404).json({ message: "Avatar not found" });
+    res.status(404).json({ message: "Avatar not found" }); 
   }
 };
  

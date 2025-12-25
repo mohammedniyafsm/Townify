@@ -4,6 +4,7 @@ import userRoute from "./modules/users/users.routes.js";
 import spaceRoute from "./modules/spaces/spaces.routes.js";
 import mapRoute from "./modules/maps/maps.routes.js";
 import avatarRoute from "./modules/avatars/avatars.routes.js";
+import adminRoute from "./modules/admin/admin.routes.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
 import cookieParser from "cookie-parser";
@@ -41,6 +42,7 @@ app.use('/user', userRoute);
 app.use('/spaces', spaceRoute);
 app.use('/map', mapRoute);
 app.use('/avatar', avatarRoute);
+app.use('/admin',adminRoute);
 
 
 app.listen(8080, () => {

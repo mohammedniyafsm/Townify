@@ -14,6 +14,7 @@ import {
   deleteAvatar,
 } from "./avatars.controller.js";
 import { imageUpload } from "../../shared/services/multer.service.js";
+import { adminMiddleware } from "src/shared/middleware/auth.middleware.js";
 
 const router:Router = Router();
 
@@ -31,11 +32,11 @@ const avatarUpload=()=>{
    { name: 'idle', maxCount: 1}
   ])
 }
-router.post("/", avatarUpload(), uploadAvatar);
+router.post("/", adminMiddleware,avatarUpload(), uploadAvatar);
 
 router.get("/", fetchAllAvatar);
 router.get("/:id", fetchAvatar);
-router.patch("/:id", avatarUpload(), updateAvatar);
-router.delete("/:id", deleteAvatar);
+router.patch("/:id", adminMiddleware,avatarUpload(), updateAvatar);
+router.delete("/:id", adminMiddleware,deleteAvatar);
 
 export default router;

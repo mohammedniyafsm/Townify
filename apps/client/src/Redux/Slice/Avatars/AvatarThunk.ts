@@ -14,7 +14,6 @@ const fetchAllAvatar=createAsyncThunk<{
 },void,{rejectValue:string}>('avatars/fetchAllAvatar',async(_,{rejectWithValue})=>{
     try {
         const response=await fetchAvatarApi()
-        console.log(response.data)
         return response.data
     } catch (error:any) {
         return rejectWithValue(error.message||"Failed to fetch avatars")
@@ -25,7 +24,6 @@ const uploadAvatar=createAsyncThunk<AvatarReturn,FormData,{rejectValue:string}>(
     try {
         console.log("Uploading avatar:", data);
         const response=await uploadAvatarApi(data)
-        console.log("Upload response:", response.data);
         toast.success("Avatar uploaded successfully")
         return response.data
     } catch (error:any) {
@@ -50,7 +48,6 @@ const updateAvatar=createAsyncThunk<AvatarReturn,{id:string,data:FormData},{reje
     try {
         const response=await updateAvatarApi(id, data)  
         toast.success("Avatar updated successfully")   
-        console.log("Update response:", response.data);     
         return response.data
     } catch (error:any) {
         toast.error(error.message||"Failed to update avatar")

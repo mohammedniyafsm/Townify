@@ -12,6 +12,8 @@ export const loginService = async (email: string, password: string) => {
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) throw new Error("INVALID_CREDENTIALS");
 
+  if (!user.isActive) throw new Error("USER_BLOCKED");
+
   const otp = Math.floor(10000 + Math.random() * 90000).toString();
 
   await cacheSet(`otp:${email}`, otp, 300);
@@ -29,6 +31,7 @@ export const signupService = async (
   if (exists) throw new Error("USER_EXISTS");
 
   const hashed = await bcrypt.hash(password, 10);
+  await cacheDel("users:list")
 
   await prisma.user.create({
     data: {
@@ -95,6 +98,7 @@ export const googleLoginService = async (code: string) => {
   });
 
   if (!user) {
+    await cacheDel("users:list")
     user = await prisma.user.create({
       data: {
         email: googleUser.email,
@@ -106,6 +110,7 @@ export const googleLoginService = async (code: string) => {
       include: { avatar: true, space: true },
     });
   }
+  if (!user.isActive) throw new Error("USER_BLOCKED");
 
   return user;
 };

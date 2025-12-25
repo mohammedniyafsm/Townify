@@ -68,10 +68,11 @@ export function SignUp() {
           withCredentials: true,
         })
         dispatch(addAuth(response.data.user))
-        navigate("/")
+        if(response.data.user.role=='admin') navigate("/admin")
+        else navigate("/")
       }
-    } catch (error) {
-      toast.error("Google login failed")
+    } catch (error:any) {
+      toast.error(error?.response?.data?.message|| error.message || "Google login failed")
       console.error(error)
     }
   }

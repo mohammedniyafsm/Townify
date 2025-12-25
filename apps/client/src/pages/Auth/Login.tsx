@@ -62,7 +62,6 @@ export function Login() {
         }, 1200)
       }
     } catch (error: any) {
-      console.log(error,"csdcsdvcds");
       toast.error(error?.response?.data?.message || error.message || "Invalid credentials")
       console.error(error)
     }
@@ -76,11 +75,12 @@ export function Login() {
         })
         console.log(response.data)
         dispatch(addAuth(response.data.user))
+        if(response.data.user.role=='admin') navigate("/admin")
+        else navigate("/")
         toast.success("Logged in with Google!")
-        navigate("/")
       }
     } catch (error: any) {
-      toast.error("Google login failed")
+      toast.error(error?.response?.data?.message || error.message|| "Google login failed")
       console.error(error)
     }
   }

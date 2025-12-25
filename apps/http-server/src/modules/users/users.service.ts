@@ -1,3 +1,4 @@
+import { cacheDel } from "@repo/cache/dist/index.js";
 import { uploadToCloudinary } from "../../shared/services/cloudinary.service.js";
 import { getUserById, updateUser } from "./users.repository.js";
 
@@ -41,6 +42,6 @@ export const updateUserProfileService = async ({
 
         data.profile = result?.secure_url;
     }
-
+    await cacheDel("users:list")
     return updateUser(userId, data);
 };

@@ -80,7 +80,7 @@ export function OTP() {
                 toast.success("LoggedIn Successful!.", {
                     action: {
                         label: "Home",
-                        onClick: () => navigate("/"),
+                        onClick: () =>{ response.data.role=='admin'?navigate("/admin"): navigate("/")},
                     },
                 });
                 setTimeout(() => {

@@ -11,6 +11,7 @@ import {
   blockMember,
 } from "./spaces.repository.js";
 import { sendInvitationEmail } from "../../shared/services/nodemailer.service.js";
+import { cacheDel } from "@repo/cache/dist/index.js";
 
 export const createSpaceService = async (
   userId: string,
@@ -23,6 +24,7 @@ export const createSpaceService = async (
 
   const space = await createSpaceRepo({ name, creatorId: userId, mapId });
   await addMember(space.slug, userId);
+   await cacheDel("spaces:list")
 
   return space;
 };
@@ -35,6 +37,7 @@ export const updateSpaceService = async (
   const space = await findSpaceById(spaceId);
   if (!space) throw new Error("SPACE_NOT_FOUND");
 
+  await cacheDel("spaces:list")
   return updateSpaceRepo(spaceId, {
     ...(name && { name: name.trim() }),
     ...(mapId && { mapId }),
@@ -49,6 +52,7 @@ export const deleteSpaceService = async (
   if (!space) throw new Error("SPACE_NOT_FOUND");
   if (space.creatorId !== userId) throw new Error("FORBIDDEN");
 
+  await cacheDel("spaces:list")
   await deleteSpaceRepo(spaceId, space.slug);
 };
 

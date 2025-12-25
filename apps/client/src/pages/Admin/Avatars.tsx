@@ -1,4 +1,4 @@
-import {  useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Plus } from "lucide-react";
@@ -12,10 +12,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/Redux/stroe";
 import type { AvatarSchema } from "@repo/types";
-import ShimmerCard from "../../../components/Admin/Avatar/ShimmerCard";
-import AvatarCard from "../../../components/Admin/Avatar/AvatarCard";
-import AvatarForm from "../../../components/Admin/Avatar/AvatarForm";
-import EditAvatarModal from "../../../components/Admin/Avatar/EditAvatarModal";
+import ShimmerCard from "../../components/Admin/Avatar/ShimmerCard";
+import AvatarCard from "../../components/Admin/Avatar/AvatarCard";
+import AvatarForm from "../../components/Admin/Avatar/AvatarForm";
+import EditAvatarModal from "../../components/Admin/Avatar/EditAvatarModal";
 import { deleteAvatar, updateAvatar, uploadAvatar } from "@/Redux/Slice/Avatars/AvatarThunk";
 
 interface AvatarFormData {

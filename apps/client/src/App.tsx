@@ -16,9 +16,11 @@ import Pricing from "./pages/Pricing";
 import Sidebar from "./components/Admin/Sidebar/Sidebar";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import Maps from "./pages/Admin/Maps";
-import Avatars from "./pages/Admin/Avatar/Avatars";
+import Avatars from "./pages/Admin/Avatars";
 import UserManagement from "./pages/Admin/UserManagement";
 import { fetchAllAvatar } from "./Redux/Slice/Avatars/AvatarThunk";
+import { fetchAllMaps } from "./Redux/Slice/Maps/MapThunk";
+import { fetchAdminDashboard } from "./Redux/Slice/AdminUsers/UsersThunk";
 
 function App() {
   const dispatch=useDispatch<AppDispatch>()
@@ -30,6 +32,10 @@ function App() {
   useEffect(()=>{
     if(auth.status!='succeeded') return
     dispatch(fetchAllAvatar())
+    dispatch(fetchAllMaps())
+    if(auth?.user?.role=="admin"&&auth.status=='succeeded'){
+      dispatch(fetchAdminDashboard())
+    }
   },[auth.status])
 
 

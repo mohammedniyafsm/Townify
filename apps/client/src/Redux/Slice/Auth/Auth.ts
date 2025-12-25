@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit'
 import type {UserSchema} from '@repo/types'
 import { fetchUser, updateUser } from './AuthThunk'
+import { adminLogout } from '../AdminUsers/UsersThunk'
 
 interface AuthState{
     user:UserSchema | null,
@@ -50,6 +51,11 @@ const AuthSlice=createSlice({
         })
          .addCase(updateUser.pending,(state)=>{
             state.status='loading'
+        })
+
+        .addCase(adminLogout.fulfilled,(state)=>{
+            state.user=null;
+            state.status='idle'
         })
         
     },

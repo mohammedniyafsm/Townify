@@ -22,6 +22,9 @@ export const login = async (req: Request, res: Response) => {
     if (err.message === "INVALID_CREDENTIALS") {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+    else if (err.message === "USER_BLOCKED") {
+      return res.status(403).json({ message: "User account is blocked" });
+    }
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -110,7 +113,10 @@ export const googleLogin = async (req: Request, res: Response) => {
     });
 
     return res.json({ user });
-  } catch {
+  } catch (err: any) {
+    if (err.message === "USER_BLOCKED") {
+      return res.status(403).json({ message: "User account is blocked" });
+    }
     return res.status(500).json({ message: "Google login failed" });
   }
 };
@@ -127,3 +133,12 @@ export const logout = async (_: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+export const adminDashboard = async (req: Request, res: Response) => {
+  try {
+    
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}

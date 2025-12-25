@@ -1,12 +1,25 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { FiMenu, FiHome, FiUsers, FiBox, FiShoppingCart, FiLogOut } from "react-icons/fi";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  FiMenu,
+  FiHome,
+  FiUsers,
+  FiBox,
+  FiShoppingCart,
+  FiLogOut,
+} from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "@/Redux/stroe";
+import { adminLogout } from "@/Redux/Slice/AdminUsers/UsersThunk";
 
 const Sidebar = ({ children }: { children: React.ReactNode }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const auth = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
+  const navigate =useNavigate()
 
   useEffect(() => {
     const handleResize = () => {
@@ -20,12 +33,31 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
 
   const menuItems = [
     { id: "dashboard", icon: <FiHome />, label: "Dashboard", path: "/admin" },
-    { id: "users", icon: <FiUsers />, label: "User Management", path: "/admin/user" },
+    {
+      id: "users",
+      icon: <FiUsers />,
+      label: "User Management",
+      path: "/admin/user",
+    },
     { id: "maps", icon: <FiBox />, label: "Maps", path: "/admin/maps" },
-    { id: "avatars", icon: <FiShoppingCart />, label: "Avatars", path: "/admin/avatars" },
+    {
+      id: "avatars",
+      icon: <FiShoppingCart />,
+      label: "Avatars",
+      path: "/admin/avatars",
+    },
   ];
 
   const toggleSidebar = () => setIsExpanded(!isExpanded);
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(adminLogout()).unwrap()
+      navigate('/login')
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }
 
   // Helper function to check if a menu item is active
   const isActiveItem = (path: string) => {
@@ -74,9 +106,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                 className="h-8 w-8 rounded-full object-cover"
               />
               {isExpanded && (
-                <span className="font-bold text-lg text-gray-800">
-                  Townify
-                </span>
+                <span className="font-bold text-lg text-gray-800">Townify</span>
               )}
             </div>
             <button
@@ -103,9 +133,10 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                   }}
                   className={`w-full flex items-center p-3 transition-all
                     ${!isExpanded ? "justify-center" : "px-4"}
-                    ${isActive
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-600 hover:bg-gray-100"
+                    ${
+                      isActive
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-600 hover:bg-gray-100"
                     }`}
                   aria-label={item.label}
                   aria-current={isActive ? "page" : undefined}
@@ -118,26 +149,53 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
           </nav>
 
           <div className="border-t border-gray-200 p-4">
-            <div className="flex items-center gap-3">
-              <img
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"
-                alt="User Profile"
-                className="h-8 w-8 rounded-full object-cover"
-              />
-              {isExpanded && (
-                <div className="flex-1">
-                  <p className="font-medium text-gray-800">John Doe</p>
-                  <p className="text-sm text-gray-500">Admin</p>
+            {auth.status == "loading" ? (
+              <div className="animate-pulse flex items-center gap-3">
+                <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
+                {isExpanded && (
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  {auth.user?.profile ? (
+                    <img
+                      src={auth.user?.profile || ""}
+                      alt="User Profile"
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
+                      {auth.user?.name
+                        ? auth.user.name.charAt(0).toUpperCase()
+                        : "U"}
+                    </div>
+                  )}
+                  {isExpanded && (
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-800">
+                        {auth.user?.name}
+                      </p>
+                      <p className="text-sm text-gray-500">Admin</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
             <button
+            onClick={handleLogout}
               className={`w-full flex items-center p-3 mt-2 rounded-lg hover:bg-red-50 text-red-600
                 ${!isExpanded ? "justify-center" : ""}`}
               aria-label="Logout"
             >
               {/* Fixed: Using text-xl class to match menu icon sizes */}
-              <span className="text-xl"><FiLogOut /></span>
+              <span className="text-xl">
+                <FiLogOut />
+              </span>
               {isExpanded && <span className="ml-3">Logout</span>}
             </button>
           </div>
@@ -149,9 +207,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
           )}
         </motion.div>
       </AnimatePresence>
-      <div className="ml-16">
-        {children}
-      </div>
+      <div className="ml-16">{children}</div>
     </>
   );
 };

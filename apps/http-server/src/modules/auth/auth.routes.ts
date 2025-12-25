@@ -14,6 +14,7 @@ import {
   logout,
   resendOtp,
 } from "./auth.controller.js";
+import { userMiddleware } from "src/shared/middleware/auth.middleware.js";
 
 const router:Router = Router();
 
@@ -161,6 +162,8 @@ router.get("/googlelogin", googleLogin);
  *       200:
  *         description: Logged out successfully
  */
-router.post("/logout", logout);
+router.post("/logout",userMiddleware, logout);
+
+
 
 export default router;
