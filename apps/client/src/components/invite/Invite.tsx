@@ -5,7 +5,8 @@ import { Check, Link } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Spinner } from "../ui/spinner";
-import { InviteUsers } from "@/api/SpaceApi";
+import { inviteUsersToSpace } from "@/api/SpaceApi";
+import Navbar from "./Navbar";
 
 function Invite() {
     const { slug } = useParams();
@@ -84,7 +85,7 @@ function Invite() {
         // ✅ email invites flow
         try {
             setLoading(true);
-            await InviteUsers(slug, emails, url);
+            await inviteUsersToSpace(slug, emails, url);
             toast.success("Invitations sent successfully");
             navigate(`/lobby/${slug}`);
         } catch (error: any) {
@@ -98,19 +99,7 @@ function Invite() {
 
     return (
         <div>
-            <div className="flex items-center px-20 py-8">
-                <div
-                    onClick={() => navigate("/")}
-                    className="flex gap-2 items-center cursor-pointer"
-                >
-                    <img
-                        src="https://res.cloudinary.com/dnkenioua/image/upload/v1764999707/Group_ik1uap.png"
-                    />
-                    <h1 className="font-inter font-semibold text-sm md:text-lg">
-                        Townify
-                    </h1>
-                </div>
-            </div>
+            <Navbar />
 
             <div className="flex justify-center gap-10 mt-10">
                 <div className="font-bricogrotesque text-4xl font-semibold">

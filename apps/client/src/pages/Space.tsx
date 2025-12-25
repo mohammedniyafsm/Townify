@@ -1,28 +1,37 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import LobbyContent from "@/components/RoomLobby/LobbyContent";
-import RoomLobbyNAv from "@/components/RoomLobby/RoomLobbyNAv";
+import Game from "../game/Game";
+import Navbar from "@/components/invite/Navbar";
+
+import { fetchSpaceBySlug, checkSpaceAccess } from "@/api/SpaceApi";
 
 import Loading from "@/components/JoinRoom/Loading";
 import BlockedUser from "@/components/JoinRoom/BlockedUser";
 import SpaceNotFound from "@/components/JoinRoom/SpaceNotFound";
 
-import { checkSpaceAccess } from "@/api/SpaceApi";
+type SpaceState = "loading" | "allowed" | "blocked" | "not-found";
 
-type LobbyState = "loading" | "allowed" | "blocked" | "not-found";
-
-function RoomLobby() {
+export default function Space() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  const [state, setState] = useState<LobbyState>("loading");
+  const [state, setState] = useState<SpaceState>("loading");
+  const [mapUrl, setMapUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const verifyAccess = async () => {
+    if (!slug) return;
+
+    const loadSpace = async () => {
       try {
-        await checkSpaceAccess(slug as string);
-        setState("allowed"); // ✅ member or owner
+        // 🔐 1️⃣ Access check FIRST
+        await checkSpaceAccess(slug);
+
+        // 🗺️ 2️⃣ Load space data
+        const res = await fetchSpaceBySlug(slug);
+        setMapUrl(res.data.space.map.configJson);
+
+        setState("allowed");
       } catch (error: any) {
         const message = error?.response?.data?.message;
 
@@ -38,8 +47,10 @@ function RoomLobby() {
       }
     };
 
-    verifyAccess();
+    loadSpace();
   }, [slug, navigate]);
+
+  // ---------------- UI STATES ----------------
 
   return (
     <div className="min-h-screen w-full bg-[#f8fafc] relative">
@@ -61,20 +72,24 @@ function RoomLobby() {
         }}
       />
 
-      {/* Navbar ALWAYS visible */}
+      {/* Content */}
       <div className="relative">
-        <RoomLobbyNAv />
+        <Navbar />
 
-        {state === "loading" && <Loading />}
+        {state === "loading" && (
+            <Loading />
+        )}
 
         {state === "blocked" && <BlockedUser />}
 
         {state === "not-found" && <SpaceNotFound />}
 
-        {state === "allowed" && <LobbyContent />}
+        {state === "allowed" && mapUrl && (
+          <div className="w-screen h-screen">
+            <Game mapUrl={mapUrl} />
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
-export default RoomLobby;

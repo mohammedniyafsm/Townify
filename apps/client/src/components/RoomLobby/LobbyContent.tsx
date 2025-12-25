@@ -10,7 +10,7 @@ import AllAvatarsModal from "./AllAvatarsModal";
 import { FetchAllAvatars } from "@/api/avatar";
 import type { AppDispatch, RootState } from "@/Redux/stroe";
 import type { Avatar } from "@/types/type";
-import { findSpaceBySlug } from "@/api/SpaceApi";
+import { fetchSpaceBySlug } from "@/api/SpaceApi";
 import { Spinner } from "../ui/spinner";
 import { updateUser } from "@/Redux/Slice/Auth/AuthThunk";
 import { Button } from "../ui/button";
@@ -39,7 +39,7 @@ function LobbyContent() {
         setLoading(true);
 
         const [spaceData, avatarData] = await Promise.all([
-          findSpaceBySlug(slug),
+          fetchSpaceBySlug(slug),
           FetchAllAvatars(),
         ]);
 

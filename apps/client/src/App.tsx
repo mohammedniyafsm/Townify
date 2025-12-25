@@ -21,6 +21,8 @@ import UserManagement from "./pages/Admin/UserManagement";
 import { fetchAllAvatar } from "./Redux/Slice/Avatars/AvatarThunk";
 import { fetchAllMaps } from "./Redux/Slice/Maps/MapThunk";
 import { fetchAdminDashboard } from "./Redux/Slice/AdminUsers/UsersThunk";
+import Space from "./pages/Space";
+import Join from "./pages/Join";
 
 function App() {
   const dispatch=useDispatch<AppDispatch>()
@@ -56,8 +58,10 @@ function App() {
             <Route path="/auth/otp" element={<OTP />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/app" element={<Dashboard />} />
+            <Route path="/join/:slug" element={<Join />} />
             <Route path="/invite/:slug" element={<InviteMembers />} />
             <Route path="/lobby/:slug" element={<RoomLobby />} />
+            <Route path="/space/:slug" element={<Space />} />
             <Route path="/admin" element={<AdminSideBar/>}>
                   <Route index element={<AdminDashboard />} />
                   <Route path="maps" element={<Maps />} />

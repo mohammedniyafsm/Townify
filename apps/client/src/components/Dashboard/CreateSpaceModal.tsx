@@ -1,5 +1,5 @@
 import { Building } from "lucide-react";
-import { CreateSpaceApi, fetchAllRoomTemplate } from '../../api/SpaceApi';
+import { createSpace, fetchAllRoomTemplates } from '../../api/SpaceApi';
 import { type CreateRoomModalI, type mapTemplateI } from '@/types/type';
 import { useEffect, useRef, useState } from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
@@ -24,7 +24,7 @@ function CreateSpaceModal({ CreateRoom, setCreateRoom }: CreateRoomModalI) {
     useEffect(() => {
         setLoading(true);
         const fetchMapTemplate = async () => {
-            const response = await fetchAllRoomTemplate();
+            const response = await fetchAllRoomTemplates();
             const maps = response.data.maps;
 
             setMapTemplate(maps);
@@ -44,7 +44,7 @@ function CreateSpaceModal({ CreateRoom, setCreateRoom }: CreateRoomModalI) {
             }
             if (currentMap === null) return;
             setCreateRoomLoading(true);
-            const response = await CreateSpaceApi(RoomName, currentMap.id);
+            const response = await createSpace(RoomName, currentMap.id);
             console.log(response);
 
             setTimeout(()=>{

@@ -52,7 +52,7 @@ function DashbaordNav({ setCreateRoom, setJoinRoom }: DashboardNavProps) {
                             )}
                         </div>
 
-                        <h1 className="font-inter font-semibold">{user.name}</h1>
+                        <h1 className="font-inter font-semibold">{user?.name}</h1>
                     </div>
                     <Button onClick={() => setJoinRoom(true)} variant="outline">Join Space</Button>
                     <RainbowButton onClick={() => setCreateRoom(true)}>Create Space</RainbowButton>

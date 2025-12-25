@@ -4,7 +4,7 @@ import { Input } from '../ui/input';
 import { type DashboardNavProps } from '@/types/type';
 import CreateSpaceModal from "@/components/Dashboard/CreateSpaceModal"
 import JoinRoomModal from './JoinRoomModal';
-import { deleteUserMap, FetchUsersMap } from '@/api/SpaceApi';
+import { deleteSpace, fetchUserSpaces } from '@/api/SpaceApi';
 import { MapCardShimmer } from './MapCardShimmer';
 import { RainbowButton } from '../ui/rainbow-button';
 import { toast } from 'sonner';
@@ -22,7 +22,8 @@ function DashContent({ CreateRoom, setCreateRoom, JoinRoom, setJoinRoom }: Dashb
     const fetchMap = async () => {
       try {
         setLoading(true);
-        const response = await FetchUsersMap();
+        const response = await fetchUserSpaces();
+        console.log(response);
         setuserMap(response.data.spaces || [] );
         setLoading(false);
       } catch (error) {
@@ -47,7 +48,7 @@ function DashContent({ CreateRoom, setCreateRoom, JoinRoom, setJoinRoom }: Dashb
   const deleteMap = async (id: string) => {
     try {
       setDeleteLoad(true);
-      const response = await deleteUserMap(id);
+      const response = await deleteSpace(id);
       console.log(response.data);
       setActiveMenuId(null);
       setuserMap((prev)=> prev.filter((s : any)=>(
