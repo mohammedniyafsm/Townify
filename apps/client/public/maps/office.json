@@ -3430,14 +3430,14 @@
          "margin":0,
          "name":"m-bg",
          "spacing":0,
-         "tilecount":375,
+         "tilecount":0,
          "tileheight":32,
          "tilewidth":32
         }, 
         {
          "columns":7,
          "firstgid":376,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/g2.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/g2.png",
          "imageheight":224,
          "imagewidth":224,
          "margin":0,
@@ -3450,7 +3450,7 @@
         {
          "columns":5,
          "firstgid":425,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/g1.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/g1.png",
          "imageheight":192,
          "imagewidth":160,
          "margin":0,
@@ -3463,7 +3463,7 @@
         {
          "columns":2,
          "firstgid":455,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/shelf-1.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/shelf-1.png",
          "imageheight":96,
          "imagewidth":64,
          "margin":0,
@@ -3476,7 +3476,7 @@
         {
          "columns":36,
          "firstgid":461,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/floor-1.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/floor-1.png",
          "imageheight":2240,
          "imagewidth":1152,
          "margin":0,
@@ -3489,7 +3489,7 @@
         {
          "columns":9,
          "firstgid":2981,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/roundtable.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/roundtable.png",
          "imageheight":128,
          "imagewidth":288,
          "margin":0,
@@ -3502,7 +3502,7 @@
         {
          "columns":51,
          "firstgid":3017,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/sofa.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/sofa.png",
          "imageheight":416,
          "imagewidth":1648,
          "margin":0,
@@ -3515,7 +3515,7 @@
         {
          "columns":9,
          "firstgid":3680,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/officeplants[2x1].png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/officeplants[2x1].png",
          "imageheight":256,
          "imagewidth":288,
          "margin":0,
@@ -3528,7 +3528,7 @@
         {
          "columns":9,
          "firstgid":3752,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/officeplants[1x1].png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/officeplants[1x1].png",
          "imageheight":288,
          "imagewidth":288,
          "margin":0,
@@ -3541,7 +3541,7 @@
         {
          "columns":1,
          "firstgid":3833,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/plant_potted_skinny_terracotta.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/plant_potted_skinny_terracotta.png",
          "imageheight":64,
          "imagewidth":32,
          "margin":0,
@@ -3554,7 +3554,7 @@
         {
          "columns":15,
          "firstgid":3835,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/planter_boxes.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/planter_boxes.png",
          "imageheight":512,
          "imagewidth":480,
          "margin":0,
@@ -3567,7 +3567,7 @@
         {
          "columns":30,
          "firstgid":4075,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/cushion.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/cushion.png",
          "imageheight":32,
          "imagewidth":960,
          "margin":0,
@@ -3580,7 +3580,7 @@
         {
          "columns":12,
          "firstgid":4105,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/desk_cyberpunk (1).png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/desk_cyberpunk (1).png",
          "imageheight":640,
          "imagewidth":384,
          "margin":0,
@@ -3593,7 +3593,7 @@
         {
          "columns":6,
          "firstgid":4345,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/chair_neonoir.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/chair_neonoir.png",
          "imageheight":320,
          "imagewidth":192,
          "margin":0,
@@ -3606,7 +3606,7 @@
         {
          "columns":128,
          "firstgid":4405,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/WallpaperExploration.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/WallpaperExploration.png",
          "imageheight":2458,
          "imagewidth":4096,
          "margin":0,
@@ -3619,7 +3619,7 @@
         {
          "columns":5,
          "firstgid":14133,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/booth big black [5x5].png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/booth big black [5x5].png",
          "imageheight":160,
          "imagewidth":160,
          "margin":0,
@@ -3632,7 +3632,7 @@
         {
          "columns":27,
          "firstgid":14158,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/booth.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/booth.png",
          "imageheight":192,
          "imagewidth":864,
          "margin":0,
@@ -5106,7 +5106,7 @@
         {
          "columns":16,
          "firstgid":14320,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/dresser_1x2_drawers.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/dresser_1x2_drawers.png",
          "imageheight":128,
          "imagewidth":512,
          "margin":0,
@@ -5119,7 +5119,7 @@
         {
          "columns":16,
          "firstgid":14384,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/ikea_shelf.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/ikea_shelf.png",
          "imageheight":288,
          "imagewidth":512,
          "margin":0,
@@ -5132,7 +5132,7 @@
         {
          "columns":10,
          "firstgid":14528,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/office_filecabinets.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/office_filecabinets.png",
          "imageheight":128,
          "imagewidth":320,
          "margin":0,
@@ -5145,7 +5145,7 @@
         {
          "columns":12,
          "firstgid":14568,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/lamp_floor.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/lamp_floor.png",
          "imageheight":192,
          "imagewidth":384,
          "margin":0,
@@ -5158,7 +5158,7 @@
         {
          "columns":26,
          "firstgid":14640,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/botanical_garden.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/botanical_garden.png",
          "imageheight":253,
          "imagewidth":840,
          "margin":0,
@@ -5171,7 +5171,7 @@
         {
          "columns":6,
          "firstgid":14822,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/flag_jolly_roger.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/flag_jolly_roger.png",
          "imageheight":64,
          "imagewidth":192,
          "margin":0,
@@ -5184,7 +5184,7 @@
         {
          "columns":96,
          "firstgid":14834,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/vending_machine@2x.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/vending_machine@2x.png",
          "imageheight":960,
          "imagewidth":3072,
          "margin":0,
@@ -5197,7 +5197,7 @@
         {
          "columns":48,
          "firstgid":17714,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/vending_machine.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/vending_machine.png",
          "imageheight":480,
          "imagewidth":1536,
          "margin":0,
@@ -5210,7 +5210,7 @@
         {
          "columns":28,
          "firstgid":18434,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/more walls.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/more walls.png",
          "imageheight":2528,
          "imagewidth":900,
          "margin":0,
@@ -5223,7 +5223,7 @@
         {
          "columns":5,
          "firstgid":20646,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/cabinet_chippendale_thin_arch.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/cabinet_chippendale_thin_arch.png",
          "imageheight":372,
          "imagewidth":160,
          "margin":0,
@@ -5236,7 +5236,7 @@
         {
          "columns":2,
          "firstgid":20701,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/table_round_marble.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/table_round_marble.png",
          "imageheight":256,
          "imagewidth":64,
          "margin":0,
@@ -5249,7 +5249,7 @@
         {
          "columns":8,
          "firstgid":20717,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/life support.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/life support.png",
          "imageheight":64,
          "imagewidth":256,
          "margin":0,
@@ -5262,7 +5262,7 @@
         {
          "columns":12,
          "firstgid":20733,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/chair_small (1).png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/chair_small (1).png",
          "imageheight":128,
          "imagewidth":384,
          "margin":0,
@@ -5275,7 +5275,7 @@
         {
          "columns":71,
          "firstgid":20781,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/Frame 1.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/Frame 1.png",
          "imageheight":1723,
          "imagewidth":2289,
          "margin":0,
@@ -5288,7 +5288,7 @@
         {
          "columns":58,
          "firstgid":24544,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/free_overview.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/free_overview.png",
          "imageheight":1792,
          "imagewidth":1886,
          "margin":0,
@@ -5301,7 +5301,7 @@
         {
          "columns":70,
          "firstgid":27792,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/desk_round.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/desk_round.png",
          "imageheight":384,
          "imagewidth":2240,
          "margin":0,
@@ -5314,7 +5314,7 @@
         {
          "columns":39,
          "firstgid":28632,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/straigh table1.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/straigh table1.png",
          "imageheight":945,
          "imagewidth":1248,
          "margin":0,
@@ -5327,7 +5327,7 @@
         {
          "columns":8,
          "firstgid":29763,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/chair_space.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/chair_space.png",
          "imageheight":128,
          "imagewidth":256,
          "margin":0,
@@ -5340,7 +5340,7 @@
         {
          "columns":135,
          "firstgid":29795,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/Frame 31.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/Frame 31.png",
          "imageheight":2297,
          "imagewidth":4322,
          "margin":0,
@@ -5353,7 +5353,7 @@
         {
          "columns":135,
          "firstgid":39380,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/Frame 31.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/Frame 31.png",
          "imageheight":2297,
          "imagewidth":4322,
          "margin":0,
@@ -5366,7 +5366,7 @@
         {
          "columns":17,
          "firstgid":48965,
-         "image":"..\/..\/..\/..\/..\/GATHER-TOWN\/tilesets\/Room_Builder_free_32x32.png",
+         "image":"..\/..\/..\/..\/..\/..\/..\/Downloads\/GATHER-TOWN\/tilesets\/Room_Builder_free_32x32.png",
          "imageheight":736,
          "imagewidth":544,
          "margin":0,

@@ -1,6 +1,6 @@
 import { joinSpace } from "@/api/SpaceApi";
 import Navbar from "@/components/invite/Navbar";
-import Loading from "@/components/JoinRoom/Loading";
+import {Loading} from "@/components/JoinRoom/Loading";
 import BlockedUser from "@/components/JoinRoom/BlockedUser";
 import RequestAccess from "@/components/JoinRoom/RequestAccess";
 import RequestSent from "@/components/JoinRoom/RequestSent";

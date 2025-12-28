@@ -6,20 +6,22 @@ export const useSocket = (
   roomId?: string,
   userId?: string,
   name?: string,
-  avatarId? : string
+  avatarId?: string
 ) => {
   useEffect(() => {
-    if (!roomId || !userId || !name ||!avatarId) return;
+    if (!roomId || !userId || !name || !avatarId) return;
 
-    const socket = connectSocket(roomId, userId, name,avatarId);
+    const socket = connectSocket(roomId, userId, name, avatarId);
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
+      console.log("📡 Socket:", message);
       handleSocketMessage(message);
     };
 
     return () => {
-      disconnectSocket();
+      disconnectSocket(roomId, userId);
     };
-  }, [roomId, userId, name]);
+  }, [roomId, userId, name, avatarId]);
 };
+ 

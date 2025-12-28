@@ -19,6 +19,8 @@ export default function Game({
   useEffect(() => {
     if (gameRef.current) return;
 
+    console.log("How many time render ")
+
     gameRef.current = new Phaser.Game(
       createConfig(mapUrl, avatarMap, localPlayer)
     );

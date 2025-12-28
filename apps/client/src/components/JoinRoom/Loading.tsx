@@ -1,6 +1,6 @@
 import { Spinner } from "../ui/spinner";
 
-function Loading() {
+export function Loading() {
   return (
     <div className="flex items-center justify-center h-[450px] gap-3 text-gray-600">
       <Spinner />
@@ -11,4 +11,16 @@ function Loading() {
   );
 }
 
-export default Loading;
+
+
+export function LoadingSpace() {
+  return (
+    <div className="flex items-center justify-center h-[450px] gap-3 text-gray-600">
+      <Spinner />
+      <span className="font-bricogrotesque">
+        Loading Space...
+      </span>
+    </div>
+  );
+}
+

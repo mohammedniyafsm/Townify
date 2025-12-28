@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import MainScene from "../scenes/ MainScene";
+import MainScene from "../scenes/MainScene";
 import type { AvatarSchema, PlayerIdentity } from "@/types/type";
 
 export default function createConfig(

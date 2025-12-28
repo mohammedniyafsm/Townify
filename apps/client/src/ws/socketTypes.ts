@@ -26,6 +26,7 @@ export type ServerMessage =
       payload: {
         userId: string;
         name: string;
+        avatarId : string;
         x: number;
         y: number;
       }[];
@@ -35,6 +36,7 @@ export type ServerMessage =
       payload: {
         userId: string;
         name: string;
+        avatarId : string;
         x: number;
         y: number;
       };

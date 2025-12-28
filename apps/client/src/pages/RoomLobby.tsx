@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import LobbyContent from "@/components/RoomLobby/LobbyContent";
 import RoomLobbyNAv from "@/components/RoomLobby/RoomLobbyNAv";
 
-import Loading from "@/components/JoinRoom/Loading";
+import {Loading} from "@/components/JoinRoom/Loading";
 import BlockedUser from "@/components/JoinRoom/BlockedUser";
 import SpaceNotFound from "@/components/JoinRoom/SpaceNotFound";
 
