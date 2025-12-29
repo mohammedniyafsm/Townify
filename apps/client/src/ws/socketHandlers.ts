@@ -25,16 +25,30 @@ export const flushPendingMessages = () => {
 
 function process(scene: any, message: ServerMessage) {
   switch (message.type) {
+
     case "ROOM_STATE":
       message.payload.forEach((u: any) => {
-        scene.isLocalUser(u.userId)
+        const player = scene.isLocalUser(u.userId)
           ? scene.spawnLocalPlayer(u)
           : scene.addRemotePlayer(u);
+
+        // 🔥 RESTORE SIT STATE
+        if (u.isSitting && u.chairId) {
+          scene.remoteSit(u.userId, u.chairId, u.facing);
+        }
       });
       break;
 
     case "USER_JOINED":
       scene.addRemotePlayer(message.payload);
+
+      if (message.payload.isSitting && message.payload.chairId) {
+        scene.remoteSit(
+          message.payload.userId,
+          message.payload.chairId,
+          message.payload.facing
+        );
+      }
       break;
 
     case "USER_MOVED":
@@ -45,20 +59,56 @@ function process(scene: any, message: ServerMessage) {
       );
       break;
 
+    case "USER_SIT":
+      scene.remoteSit(
+        message.payload.userId,
+        message.payload.chairId,
+        message.payload.facing
+      );
+      break;
+
+    case "USER_STAND":
+      scene.remoteStand(message.payload.userId);
+      break;
+
     case "USER_LEFT":
       scene.removeRemotePlayer(message.payload.userId);
       break;
   }
 }
 
-  export const sendMove = (x: number, y: number) => {
-    const socket = getSocket();
-    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+export const sendMove = (x: number, y: number) => {
+  const socket = getSocket();
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
 
-    socket.send(
-      JSON.stringify({
-        type: "USER_MOVE",
-        payload: { x, y },
-      })
-    );
-  };
+  socket.send(
+    JSON.stringify({
+      type: "USER_MOVE",
+      payload: { x, y },
+    })
+  );
+};
+
+export const sendSit = (chairId: number, facing: "up" | "down" | "left" | "right") => {
+  const socket = getSocket();
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+  socket.send(
+    JSON.stringify({
+      type: "SIT",
+      payload: { chairId, facing },
+    })
+  );
+};
+
+export const sendStand = () => {
+  const socket = getSocket();
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+  socket.send(
+    JSON.stringify({
+      type: "STAND",
+      payload: {},
+    })
+  );
+};

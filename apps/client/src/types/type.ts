@@ -67,6 +67,9 @@ export interface AvatarSchema {
   name: string;
   idle: string;        
   walkSheet: string;   
+
+  frameWidth?: number;
+  frameHeight?: number;
 }
 
 export interface PlayerIdentity {
@@ -75,3 +78,4 @@ export interface PlayerIdentity {
   name: string;
   avatarId: string;
 }
+

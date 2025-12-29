@@ -1,4 +1,6 @@
-import {HashLoader} from "react-spinners";
+import  {HashLoader}  from "react-spinners";
+
+
 function LoadingSpinner() {
   return (
     <div className="flex items-center justify-center h-[450px] gap-3 text-gray-600">

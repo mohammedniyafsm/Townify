@@ -6,6 +6,9 @@ interface UserI {
   avatarId : string,
   x : number,
   y : number,
+  isSitting? : boolean | null,
+  chairId? : number | null,
+  facing? : string | null
 }
 
 export type RoomI = {
