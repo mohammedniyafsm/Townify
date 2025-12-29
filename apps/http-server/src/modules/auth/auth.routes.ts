@@ -13,6 +13,7 @@ import {
   googleLogin,
   logout,
   resendOtp,
+  verifyToken,
 } from "./auth.controller.js";
 import { userMiddleware } from "src/shared/middleware/auth.middleware.js";
 
@@ -163,6 +164,8 @@ router.get("/googlelogin", googleLogin);
  *         description: Logged out successfully
  */
 router.post("/logout",userMiddleware, logout);
+
+router.get('/verify-token',userMiddleware,verifyToken)
 
 
 

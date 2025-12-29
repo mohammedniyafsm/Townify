@@ -25,3 +25,7 @@ export const LogoutApi = async () => {
 };
 
 
+export const userVerifyTokenApi = async () => {
+  return await axiosInstance.get("/auth/verify-token");
+}
+

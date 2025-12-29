@@ -27,6 +27,7 @@ import {
   bulkApproveInvitesByIds,
   bulkAddMembers,
   getUserIdsFromInvites,
+  getSpaceManageDetailsRepo,
 } from "./spaces.repository.js";
 import { inviteApprovalEmail, sendInvitationEmail } from "../../shared/services/nodemailer.service.js";
 import { cacheDel } from "@repo/cache/dist/index.js";
@@ -328,4 +329,12 @@ export const bulkApproveInvitesService=async(userId:string,slug:string,invitatio
    ]);
    await Promise.allSettled(spaceApprovedEmail)
    return { invites,members  };
+}
+
+
+export const getSpaceManageDetailsService=async(slug:string,userId:string)=>{
+  const space = await getSpaceManageDetailsRepo(slug);
+  if (!space) throw new Error("SPACE_NOT_FOUND");
+  if (space.creatorId.toString() != userId) throw new Error("FORBIDDEN");
+  return space;
 }

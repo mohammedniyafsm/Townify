@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { BorderBeam } from "@/components/ui/border-beam"
 import LandingNav from "@/components/Landing-page/LandingNav"
 import { GoogleIcon } from "@/components/icons/google"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { toast } from "sonner"
 import { Spinner } from "@/components/ui/spinner"
 import { useGoogleLogin } from "@react-oauth/google"
@@ -28,6 +28,8 @@ import type { AppDispatch } from "@/Redux/stroe"
 export function SignUp() {
   const navigate = useNavigate()
   const dispatch=useDispatch<AppDispatch>()
+  const [searchParams] = useSearchParams();
+  const redirectParam = searchParams.get("redirect");
 
   const {
     register,
@@ -46,15 +48,15 @@ export function SignUp() {
       })
 
       console.log(response)
-
+      const loginUrl = redirectParam ? `/login?redirect=${redirectParam}` : "/login";
       toast.success("Your account has been created!", {
         action: {
           label: "Login",
-          onClick: () => navigate("/login"),
+          onClick: () => navigate(loginUrl),
         },
       })
 
-      setTimeout(() => navigate("/login"), 1000)
+      setTimeout(() => navigate(loginUrl), 1000)
     } catch (error: any) {
       console.log(error)
       toast.error(error?.response.data.message || "Something went wrong")
@@ -69,6 +71,9 @@ export function SignUp() {
         })
         dispatch(addAuth(response.data.user))
         if(response.data.user.role=='admin') navigate("/admin")
+        else if(redirectParam){
+            navigate(redirectParam)
+        }
         else navigate("/")
       }
     } catch (error:any) {
@@ -172,7 +177,12 @@ export function SignUp() {
               Already have an account?{" "}
               <button
                 type="button"
-                onClick={() => navigate("/login")}
+                onClick={() => {
+                  if(redirectParam){
+                    navigate(`/login?redirect=${redirectParam}`)
+                  }
+                  else navigate("/login")
+                }}
                 className="underline underline-offset-4 hover:text-primary cursor-pointer"
               >
                 Log in

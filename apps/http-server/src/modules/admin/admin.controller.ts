@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import {
+  adminVerifyTokenService,
   getAdminDashboardService,
   toggleUserStatusService,
 } from "./admin.service.js";
@@ -41,3 +42,16 @@ export const logout = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
+
+
+export const adminVerifyToken = async (req:Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const auth= await adminVerifyTokenService(userId as string);
+    res.status(200).json({ message: "User valid", success: true, data: auth });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error, success: false });
+  }
+};

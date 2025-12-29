@@ -11,11 +11,12 @@ import {
   UserPlus,
   Copy,
   Trash2,
+  ArrowLeft,
 } from "lucide-react";
 import InvitationsTab from "../components/EditSpace/InvitationSpace";
 import SpaceMember from "../components/EditSpace/SpaceMember";
-import { useParams } from "react-router-dom";
-import { fetchSpaceBySlug } from "@/api/SpaceApi";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchSpaceManageBySlug } from "@/api/SpaceApi";
 import { toast } from "sonner";
 import type { SpaceI } from "@repo/types";
 import SpaceMemberShimmer from "../components/EditSpace/SpaceMemberShimmer";
@@ -27,18 +28,27 @@ function EditSpacePage() {
   const { slug } = useParams();
   const [loading, setLoading] = useState(false);
   const [spaceDetails, setSpaceDetails] = useState<SpaceI | null>(null);
+  const navigate = useNavigate();
 
   useEffect(()=>{
     setLoading(true);
     if(!slug) return
     async function fetchSpaceDetails(){
       try{
-        const response = await fetchSpaceBySlug(slug||'');
+        const response = await fetchSpaceManageBySlug(slug||'');
+        console.log("Fetched space details:", response.data);
         setSpaceDetails((_)=>response.data.space);
         console.log("Space details:", response.data);
         setLoading(false);
-      }catch(error){
-        toast.error("Failed to fetch space details.");
+      }catch(error:any){
+        if(error?.response?.data?.message==="Forbidden")
+        {
+          toast.error("You do not have permission to manage this space.");
+          setLoading(false);
+          navigate("/app");
+          return;
+        }
+        toast.error("Failed to fetch space details");
         console.error("Error fetching space details:", error);
         setLoading(false);
       }
@@ -55,9 +65,19 @@ function EditSpacePage() {
     <div className="container mx-auto p-4 md:p-6 max-w-6xl">
       {/* Header */}
       <div className="mb-6 md:mb-8">
+        <button
+        onClick={() => navigate(-1)}
+        className="flex items-center cursor-pointer gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4 md:mb-6 group"
+      >
+        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+        <span>Back</span>
+      </button>
+        <div className="flex gap-3 items-center">
+        
         <h1 className="text-2xl md:text-3xl font-bold font-bricogrotesque tracking-tight">
           Edit Space
         </h1>
+        </div>
         <p className="text-muted-foreground mt-1 md:mt-2 text-sm md:text-base">
           Manage space details, map, and members
         </p>

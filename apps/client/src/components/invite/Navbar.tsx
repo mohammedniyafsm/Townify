@@ -4,7 +4,7 @@ function Navbar() {
 
     const navigate = useNavigate();
     return (
-            <div className="flex items-center px-20 py-8">
+            <div className="flex relative z-10 items-center px-4 py-4 sm:px-6 lg:px-8 ">
                 <div
                     onClick={() => navigate("/")}
                     className="flex gap-2 items-center cursor-pointer"

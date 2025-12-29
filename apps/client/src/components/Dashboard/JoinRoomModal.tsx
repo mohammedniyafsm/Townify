@@ -4,8 +4,22 @@ import { Label } from '@radix-ui/react-label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { BorderBeam } from '../ui/border-beam'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function JoinRoomModal({ JoinRoom,setJoinRoom} : JoinRoomModalI) {
+  const [url, setUrl] = useState('')
+  const navigate = useNavigate();
+  const handleJoin = () => {  
+    const trimmedUrl = url.trim();
+    if (trimmedUrl) {
+      const parts = trimmedUrl.split('/');
+      const lastPart = parts[parts.length - 1];
+      console.log("Navigating to:", `/join/${lastPart}`);
+      navigate(`/join/${lastPart}`);
+      setJoinRoom(false);
+    }
+  }
   return (
     <div>
          {JoinRoom && (
@@ -21,7 +35,7 @@ function JoinRoomModal({ JoinRoom,setJoinRoom} : JoinRoomModalI) {
                 <div className="grid w-full items-center gap-4">
                   <div className="flex flex-col space-y-1.5 gap-1">
                     <Label htmlFor="email" className='font-bricogrotesque'>Enter Space url</Label>
-                    <Input className='font-bricogrotesque' id="email" type="email" placeholder="Paste Url..." />
+                    <Input className='font-bricogrotesque'value={url} onChange={(e)=>setUrl(e.target.value)} id="" type="text" placeholder="Paste Url..." />
                   </div>
                 </div>
               </form>
@@ -29,8 +43,8 @@ function JoinRoomModal({ JoinRoom,setJoinRoom} : JoinRoomModalI) {
 
             <CardFooter className="flex justify-end gap-3">
               <Button 
-                className='font-bricogrotesque' variant="outline" onClick={() => setJoinRoom(false)}>Cancel</Button>
-              <Button className='font-bricogrotesque'>Create</Button>
+                className='font-bricogrotesque' variant="outline" onClick={() => setJoinRoom(false)} >Cancel</Button>
+              <Button className='font-bricogrotesque' onClick={handleJoin}>Join</Button>
             </CardFooter>
 
             <BorderBeam duration={8} size={100} />

@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { BorderBeam } from "@/components/ui/border-beam"
 import LandingNav from "@/components/Landing-page/LandingNav"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { resendOtpApi, verifyOTP } from "@/api/authApi"
@@ -33,6 +33,8 @@ export function OTP() {
     console.log("EMAIL RECEIVED:", email);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
     inputRefs.current = Array(5).fill(null).map((_, i) => inputRefs.current[i] ?? null)
+    const [searchParams] = useSearchParams();
+    const redirectParam = searchParams.get("redirect");
 
     useEffect(() => {
         if (!sendOtp) return;   // Run only when sendOtp = true
@@ -74,18 +76,19 @@ export function OTP() {
             }
             setLoading(true);
             const response = await verifyOTP({ email, otp });
+            const redirectUrl = redirectParam ? redirectParam : "/";
             console.log(response)
             if (response) {
                 dispatch(addAuth(response.data.user))
                 toast.success("LoggedIn Successful!.", {
                     action: {
                         label: "Home",
-                        onClick: () =>{ response.data.role=='admin'?navigate("/admin"): navigate("/")},
+                        onClick: () =>{ response.data.role=='admin'?navigate("/admin"): navigate(redirectUrl)},
                     },
                 });
                 setTimeout(() => {
                     setLoading(false);
-                    navigate("/");
+                    navigate(redirectUrl);
                 }, 2000);
             }
         } catch (error : any) {

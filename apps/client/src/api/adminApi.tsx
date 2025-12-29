@@ -12,4 +12,8 @@ const AdminUserStatusToggleApi = (userId: string) => {
   return axiosInstance.patch(`/admin/toggle-user/${userId}`);
 };
 
-export { FetchAdminDashboardApi, AdminLogoutApi, AdminUserStatusToggleApi };
+const adminVerifyTokenApi = async () => {
+  return await axiosInstance.get("/admin/verify-token");
+}
+
+export { FetchAdminDashboardApi, AdminLogoutApi, AdminUserStatusToggleApi , adminVerifyTokenApi};

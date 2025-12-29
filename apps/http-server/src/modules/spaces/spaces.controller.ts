@@ -15,6 +15,7 @@ import {
   toggleMemberService,
   bulkRemoveInvitesService,
   bulkApproveInvitesService,
+  getSpaceManageDetailsService,
 } from "./spaces.service.js";
 
 export const createSpace = async (req: Request, res: Response) => {
@@ -227,5 +228,26 @@ export const bulkApproveInvites = async (req: Request, res: Response) => {
       return res.status(404).json({ message: e.message });
     }
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+export const getSpaceManageDetails=async(req:Request,res:Response)=>{
+  try {
+    const { slug } = req.params;  
+    const space = await getSpaceManageDetailsService(
+      slug as string,
+      req.user!.userId
+    );
+    res.status(200).json({ space });
+  }
+    catch (error: any) {
+    if (error.message === "SPACE_NOT_FOUND") {
+      return res.status(404).json({ message: "Space not found" });
+    }
+    if (error.message === "FORBIDDEN") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    res.status(500).json(error.message||"Internal Server Error");
   }
 };

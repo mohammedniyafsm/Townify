@@ -6,7 +6,7 @@ export const createSpaceRepo = (data: {
   creatorId: string;
   mapId?: string;
 }) => {
-  return prisma.space.create({ data });
+  return prisma.space.create({ data,include: { map: true }  });
 };
 
 export const findSpaceById = (id: string) => {
@@ -95,23 +95,26 @@ export const findSpaceBySlug = (slug: string) => {
     where: { slug },
     include: {
       map: true,
-      invites: true,
-      members: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              profile: true,
-            },
-          },
-        },
-      },
     },
   });
 };
 
+export const  getSpaceManageDetailsRepo=(slug:string)=>{
+  return prisma.space.findUnique({
+    where: { slug },
+    include: {
+      map: true,
+      members: {
+        include: {  
+          user: {
+            select: { id: true, name: true, email: true, profile: true },
+          },
+        },
+      },
+      invites: true,
+    },
+  });
+}
 export const createEmailInviteRepo = (spaceId: string, email: string) => {
   return prisma.spaceInvite.upsert({
     where: {

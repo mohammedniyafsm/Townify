@@ -1,68 +1,161 @@
-import { useSelector } from "react-redux";
-import { Button } from "../ui/button"
-import { RainbowButton } from "../ui/rainbow-button"
+import { useState, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Button } from "../ui/button";
+import { RainbowButton } from "../ui/rainbow-button";
 import { useNavigate } from "react-router-dom";
-import type { RootState } from "@/Redux/stroe";
+import type { AppDispatch, RootState } from "@/Redux/stroe";
 import type { UserI } from "@repo/types";
 import type React from "react";
+import { LogoutApi } from "@/api/authApi";
+import { removeAuth } from "@/Redux/Slice/Auth/Auth";
 
 interface DashboardNavProps {
-    setCreateRoom: React.Dispatch<React.SetStateAction<boolean>>;
-    setJoinRoom: React.Dispatch<React.SetStateAction<boolean>>;
+  setCreateRoom: React.Dispatch<React.SetStateAction<boolean>>;
+  setJoinRoom: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function DashbaordNav({ setCreateRoom, setJoinRoom }: DashboardNavProps) {
+function DashboardNav({ setCreateRoom, setJoinRoom }: DashboardNavProps) {
+  const navigate = useNavigate();
+  const { user } = useSelector((state: RootState) => state.user) as { user: UserI };
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const navigate = useNavigate();
-    const { user } = useSelector((state: RootState) => state.user) as { user: UserI };
+  // ✅ FIX: Separate refs
+  const desktopDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileDropdownRef = useRef<HTMLDivElement>(null);
 
-    return (
-        <div className="fixed top-0 z-100 w-screen bg-white ">
-            <div className="flex justify-between px-6 md:px-16 lg:px-24 py-6 items-center bg-background">
+  const dispatch = useDispatch<AppDispatch>();
 
-                {/* Logo + Nav */}
-                <div className="flex items-center gap-10 lg:gap-20">
-                    {/* Logo */}
-                    <div onClick={()=>navigate('/')} className="flex gap-2 items-center cursor-pointer ">
-                        <img
-                            src="https://res.cloudinary.com/dnkenioua/image/upload/v1764999707/Group_ik1uap.png"
-                            className=" "
-                        />
-                        <h1 className="font-inter font-semibold text-sm md:text-lg">Townify</h1>
-                    </div>
+  // ✅ FIXED click outside logic
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!isDropdownOpen) return;
 
-                    {/* Desktop Nav */}
-                    <div className="hidden md:flex gap-6 lg:gap-8 font-inter text-[#52525C] ">
-                        <h1 onClick={() => navigate('/')} className="cursor-pointer hover:text-foreground hover:underline">My Space</h1>
-                    </div>
-                </div>
+      const target = event.target as Node;
 
-                {/* Desktop Buttons */}
-                <div className="hidden md:flex gap-4 items-center">
-                    <div className="flex items-center gap-4 hover:bg-[#f2f7fc] px-6 py-2 rounded-2xl">
-                        <div className="h-10 w-10 rounded-full flex items-center justify-center bg-primary text-white font-semibold uppercase">
-                            {user?.profile ? (
-                                <img
-                                    src={user?.profile}
-                                    alt={user?.name}
-                                    className="h-10 w-10 rounded-full object-cover"
-                                />
-                            ) : (
-                                <span>{user?.name?.charAt(0) ?? "U"}</span>
-                            )}
-                        </div>
+      if (
+        desktopDropdownRef.current?.contains(target) ||
+        mobileDropdownRef.current?.contains(target)
+      ) {
+        return;
+      }
 
-                        <h1 className="font-inter font-semibold">{user?.name}</h1>
-                    </div>
-                    <Button onClick={() => setJoinRoom(true)} variant="outline">Join Space</Button>
-                    <RainbowButton onClick={() => setCreateRoom(true)}>Create Space</RainbowButton>
-                </div>
+      setIsDropdownOpen(false);
+    };
 
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
+
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    try {
+      await LogoutApi();
+    } catch (error) {
+      console.error("Logout API failed:", error);
+    } finally {
+      dispatch(removeAuth());
+      setIsDropdownOpen(false);
+      navigate("/");
+    }
+  };
+
+  const handleProfile = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDropdownOpen(false);
+    navigate("/profile");
+  };
+
+  const toggleDropdown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDropdownOpen(prev => !prev);
+  };
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 md:h-20">
+
+          {/* Logo */}
+          <div onClick={() => navigate('/')} className="flex items-center gap-2 cursor-pointer group">
+            <div className="relative">
+              <img
+                src="https://res.cloudinary.com/dnkenioua/image/upload/v1764999707/Group_ik1uap.png"
+                alt="Townify Logo"
+                className="h-8 w-8 md:h-10 md:w-10 transition-transform group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-sm group-hover:blur-md transition-all"></div>
             </div>
+            <h1 className="font-inter font-bold text-lg md:text-xl bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Townify
+            </h1>
+          </div>
 
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-6">
+            <button className="font-inter text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50">
+              My Space
+            </button>
+
+            <Button onClick={() => setJoinRoom(true)} variant="outline" className="border-gray-300 hover:border-gray-400 text-gray-700">
+              Join Space
+            </Button>
+
+            <RainbowButton onClick={() => setCreateRoom(true)} className="shadow-lg hover:shadow-xl transition-shadow">
+              Create Space
+            </RainbowButton>
+
+            {/* Desktop Dropdown */}
+            <div className="relative ml-4" ref={desktopDropdownRef}>
+              <button onClick={toggleDropdown} className="flex items-center gap-3 px-4 py-2 rounded-2xl hover:bg-gray-50 transition-all duration-200 border border-transparent hover:border-gray-200">
+    <div className="h-10 w-10 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold uppercase shadow-md">
+      {user?.profile ? (
+        <img src={user.profile} alt={user.name} className="h-full w-full rounded-full object-cover border-2 border-white" />
+      ) : (
+        <span className="text-lg">{user?.name?.charAt(0) ?? "U"}</span>
+      )}
+    </div>
+    {/* Username moved HERE, outside the circle */}
+    <span className="font-inter font-semibold text-gray-900">
+      {user?.name}
+    </span>
+  </button>
+
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                  <button onClick={handleProfile} className="w-full px-4 py-3 text-left hover:bg-gray-50">
+                    Profile
+                  </button>
+                  <button onClick={handleLogout} className="w-full px-4 py-3 text-left hover:bg-red-50 text-red-600">
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="flex md:hidden" ref={mobileDropdownRef}>
+            <button onClick={toggleDropdown} className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+              {user?.name?.charAt(0) ?? "U"}
+            </button>
+
+            {isDropdownOpen && (
+              <div className="absolute right-4 top-16 w-56 bg-white rounded-xl shadow-lg border py-2 z-50">
+                <button onClick={handleProfile} className="w-full px-4 py-3 text-left hover:bg-gray-50">
+                  Profile
+                </button>
+                <button onClick={handleLogout} className="w-full px-4 py-3 text-left hover:bg-red-50 text-red-600">
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
 
         </div>
-    )
+      </div>
+    </div>
+  );
 }
 
-export default DashbaordNav
+export default DashboardNav;

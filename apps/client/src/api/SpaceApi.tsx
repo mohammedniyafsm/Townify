@@ -38,6 +38,11 @@ export const fetchSpaceBySlug = async (slug: string) => {
   return axiosInstance.get(`/spaces/${slug}`);
 };
 
+//
+export const fetchSpaceManageBySlug = async (slug: string) => {
+  return axiosInstance.get(`/spaces/creator/${slug}`);
+}
+
 // ✅ CHECK: Does current user have access to this space?
 export const checkSpaceAccess = async (slug: string) => {
   return axiosInstance.get(`/spaces/access/${slug}`);

@@ -23,6 +23,7 @@ import {
   toggleMember,
   bulkRemoveInvites,
   bulkApproveInvites,
+  getSpaceManageDetails,
 } from "./spaces.controller.js";
 
 const router:Router = Router();
@@ -59,8 +60,10 @@ router.delete("/:id", userMiddleware, deleteSpace);
 router.post("/", userMiddleware, createSpace);
 
 
+
 // ---------- ALWAYS LAST ----------
 router.get("/:slug", userMiddleware, findSpaceBySlug);
+router.get('/creator/:slug',userMiddleware, getSpaceManageDetails);
 
 
 

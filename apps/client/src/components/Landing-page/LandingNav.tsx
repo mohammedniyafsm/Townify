@@ -19,9 +19,8 @@ import { LogoutApi } from "@/api/authApi";
 
     const Logout = async ()=>{
       try {
-          dispatch(removeAuth());
           await LogoutApi();
-          console.log("Logout")
+          dispatch(removeAuth())
       } catch (error) {
         console.log(error)
       }

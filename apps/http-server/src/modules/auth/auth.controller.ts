@@ -5,6 +5,7 @@ import {
   signupService,
   googleLoginService,
   resendOtpService,
+  verifyTokenService,
 } from "./auth.service.js";
 import { generateRefreshToken } from "./auth.tokens.js";
 
@@ -135,10 +136,14 @@ export const logout = async (_: Request, res: Response) => {
 };
 
 
-export const adminDashboard = async (req: Request, res: Response) => {
+export const verifyToken = async (req:Request, res: Response) => {
   try {
-    
+    const userId = req.user?.userId;
+    const auth= await verifyTokenService(userId as string);
+    res.status(200).json({ message: "User valid", success: true, data: auth });
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error, success: false });
   }
-}
+};
