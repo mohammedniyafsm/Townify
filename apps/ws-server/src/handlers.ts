@@ -1,4 +1,4 @@
-import  WebSocket from "ws";
+import WebSocket from "ws";
 import type { BroadcastMessage, MessageI } from "./types.js";
 import { rooms } from "./room.js";
 
@@ -8,8 +8,8 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
 
         const { type, payload } = JSON.parse(rawMessage.toString()) as MessageI;
         if (!type || typeof type !== "string") return;
-        if ( !payload || typeof payload !== "object") return;
-        const { userId, name, roomId, x, y ,avatarId} = payload;
+        if (!payload || typeof payload !== "object") return;
+        const { userId, name, roomId, x, y, avatarId, isSitting, chairId, facing } = payload;
 
         switch (type) {
             case "JOIN_ROOM": {
@@ -27,9 +27,12 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 room.users.set(userId, {
                     userId,
                     name,
-                    avatarId ,
+                    avatarId,
                     x: 522,
-                    y: 655
+                    y: 655,
+                    isSitting: false,
+                    chairId: null,
+                    facing: null
                 });
 
                 (ws as any).userId = userId;
@@ -50,6 +53,9 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                         avatarId,
                         x: 522,
                         y: 655,
+                        isSitting: false,
+                        chairId: null,
+                        facing: null
                     },
                 }, userId);
                 break;
@@ -95,6 +101,66 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 if (room.users.size === 0) {
                     rooms.delete(roomId);
                 }
+                break;
+            }
+
+            case "SIT": {
+                const userId = (ws as any).userId;
+                const roomId = (ws as any).roomId;
+
+                if (!userId || !roomId || !chairId || !facing) return;
+
+                const room = rooms.get(roomId);
+                if (!room) return;
+
+                const user = room.users.get(userId);
+                if (!user) return;
+
+                user.isSitting = true;
+                user.chairId = chairId;
+                user.facing = facing;
+
+                brodCastRoom(
+                    room.sockets,
+                    {
+                        type: "USER_SIT",
+                        payload: {
+                            userId,
+                            chairId,
+                            facing,
+                        },
+                    },
+                    userId
+                );
+
+                break;
+            }
+
+            case "STAND": {
+                const userId = (ws as any).userId;
+                const roomId = (ws as any).roomId;
+
+                if (!userId || !roomId) return;
+
+                const room = rooms.get(roomId);
+                if (!room) return;
+
+                const user = room.users.get(userId);
+                if (!user) return;
+
+                user.isSitting = false;
+                user.chairId = null;
+                user.facing = null;
+
+                brodCastRoom(
+                    room.sockets,
+                    {
+                        type: "USER_STAND",
+                        payload: { userId },
+                    },
+                    userId
+                );
+
                 break;
             }
         }

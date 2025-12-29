@@ -15,6 +15,39 @@ export default class MainScene extends Phaser.Scene {
 
   private collisionGroup!: Phaser.Physics.Arcade.StaticGroup;
 
+  private loadObjectCollisionLayer(
+    map: Phaser.Tilemaps.Tilemap,
+    layerName: string
+  ) {
+    const layer = map.getObjectLayer(layerName);
+    if (!layer) return;
+
+    layer.objects.forEach(obj => {
+      if (
+        obj.x == null ||
+        obj.y == null ||
+        obj.width == null ||
+        obj.height == null
+      )
+        return;
+
+      const rect = this.add.rectangle(
+        obj.x + obj.width / 2,
+        obj.y + obj.height / 2,
+        obj.width,
+        obj.height
+      );
+
+      this.physics.add.existing(rect, true);
+      this.collisionGroup.add(rect);
+
+      // 🔍 debug if needed
+      // rect.setStrokeStyle(1, 0xff0000);
+      rect.setVisible(false);
+    });
+  }
+  private chairZones: Phaser.Types.Tilemaps.TiledObject[] = [];
+
 
   constructor(
     mapUrl: string,
@@ -65,38 +98,20 @@ export default class MainScene extends Phaser.Scene {
     // ---- OBJECT LAYER COLLISION ----
     this.collisionGroup = this.physics.add.staticGroup();
 
-    const collisionLayer = map.getObjectLayer("collision");
-
-    if (collisionLayer) {
-      collisionLayer.objects.forEach(obj => {
-        if (
-          obj.x == null ||
-          obj.y == null ||
-          obj.width == null ||
-          obj.height == null
-        )
-          return;
-
-        const rect = this.add.rectangle(
-          obj.x + obj.width / 2,
-          obj.y + obj.height / 2,
-          obj.width,
-          obj.height
-        );
-
-        this.physics.add.existing(rect, true);
-        this.collisionGroup.add(rect);
-
-        // 🔥 IMPORTANT: hide collision rectangles
-        rect.setVisible(false);
-      });
-    }
+    this.loadObjectCollisionLayer(map, "collision");
+    this.loadObjectCollisionLayer(map, "furniture-collision");
 
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.roundPixels = true;
 
     this.createAvatarAnimations();
+
+    const chairLayer = map.getObjectLayer("chair-zones");
+
+    if (chairLayer) {
+      this.chairZones = chairLayer.objects;
+    }
 
     new CameraController(this, map.widthInPixels, map.heightInPixels);
 
@@ -138,25 +153,60 @@ export default class MainScene extends Phaser.Scene {
     this.remotePlayers.set(user.userId, p);
   }
 
-  moveRemotePlayer(userId: string, x: number, y: number) {
-    const p = this.remotePlayers.get(userId);
-    if (!p) return;
+moveRemotePlayer(userId: string, x: number, y: number) {
+  const p = this.remotePlayers.get(userId);
+  if (!p) return;
 
-    p.playRemoteMove(x, y);
+  // 🔥 KILL previous tweens
+  this.tweens.killTweensOf(p);
 
-    this.tweens.add({
-      targets: p,
-      x,
-      y,
-      duration: 80,
-      ease: "Linear",
-      onComplete: () => p.stopRemote(),
-    });
-  }
+  p.playRemoteMove(x, y);
+
+  this.tweens.add({
+    targets: p,
+    x,
+    y,
+    duration: 100, // slightly higher for smoothness
+    ease: "Linear",
+    onComplete: () => p.stopRemote(),
+  });
+}
+
 
   removeRemotePlayer(userId: string) {
     this.remotePlayers.get(userId)?.destroy();
     this.remotePlayers.delete(userId);
+  }
+
+  getNearbyChair(player: Player) {
+    const px = player.x;
+    const py = player.y;
+
+    return this.chairZones.find(obj => {
+      if (obj.x == null || obj.y == null) return false;
+
+      const dx = px - (obj.x + (obj.width ?? 0) / 2);
+      const dy = py - (obj.y + (obj.height ?? 0) / 2);
+
+      return Math.hypot(dx, dy) < 24; // distance threshold
+    });
+  }
+
+  remoteSit(userId: string, chairId: number, facing: string) {
+    const player = this.remotePlayers.get(userId);
+    if (!player) return;
+
+    const chair = this.chairZones.find(c => c.id === chairId);
+    if (!chair) return;
+
+    player.sit(chair);
+  }
+
+  remoteStand(userId: string) {
+    const player = this.remotePlayers.get(userId);
+    if (!player) return;
+
+    player.standUp();
   }
 
   // 🔥 IMPORTANT FIX: animations PER avatar

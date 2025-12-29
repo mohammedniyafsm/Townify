@@ -45,6 +45,6 @@ app.use('/avatar', avatarRoute);
 app.use('/admin',adminRoute);
 
 
-app.listen(8080, () => {
+app.listen(8080,() => {
     console.log("Server Listining at 8080")
 })
