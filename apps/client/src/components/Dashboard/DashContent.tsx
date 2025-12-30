@@ -184,10 +184,10 @@ function DashContent({
                   
                 {activeMenuId === map?.id && (
                   <div ref={menuRef} className="absolute right-0 top-7 z-10">
-                    <div className="flex flex-col text-sm font-medium bg-background py-2 rounded-lg shadow-lg border border-gray-200 min-w-[180px]">
+                    <div className="flex flex-col text-sm font-medium bg-background py-2 rounded-lg shadow-lg border border-gray-200 min-w-[130px]">
                       <button
                         onClick={() => handlecopy(map?.slug)}
-                        className='hover:bg-[#f2f7fc] px-4 py-2 cursor-pointer flex justify-between items-center gap-2 font-bricogrotesque transition-colors'
+                        className='hover:bg-[#f2f7fc] px-4 py-2 cursor-pointer flex justify-between gap-2 items-center  font-bricogrotesque transition-colors'
                       >
                         Copy URL {copy ? <Check className='h-4 w-3' /> : <Link className='h-4 w-3' />}
                       </button>
@@ -200,7 +200,7 @@ function DashContent({
                       <button
                         onClick={() => deleteMap(map?.id)}
                         disabled={deletingId === map?.id}
-                        className='hover:bg-[#f2f7fc] font-bricogrotesque px-4 py-2 cursor-pointer flex gap-2 items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                        className='hover:bg-[#f2f7fc] font-bricogrotesque px-4 py-2 cursor-pointer flex justify-between gap-2 items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
                       >
                         {deletingId === map?.id ? (
                           <>
