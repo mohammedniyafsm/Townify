@@ -276,4 +276,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     right: { x: 6, y: 0 },
   };
 
+  destroy(fromScene?: boolean) {
+    this.nameTag.destroy(true);
+    super.destroy(fromScene);
+  }
+
 }

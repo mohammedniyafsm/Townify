@@ -46,6 +46,7 @@ export default class MainScene extends Phaser.Scene {
       rect.setVisible(false);
     });
   }
+  
   private chairZones: Phaser.Types.Tilemaps.TiledObject[] = [];
 
 
@@ -153,25 +154,24 @@ export default class MainScene extends Phaser.Scene {
     this.remotePlayers.set(user.userId, p);
   }
 
-moveRemotePlayer(userId: string, x: number, y: number) {
-  const p = this.remotePlayers.get(userId);
-  if (!p) return;
+  moveRemotePlayer(userId: string, x: number, y: number) {
+    const p = this.remotePlayers.get(userId);
+    if (!p) return;
 
-  // 🔥 KILL previous tweens
-  this.tweens.killTweensOf(p);
+    // 🔥 KILL previous tweens
+    this.tweens.killTweensOf(p);
 
-  p.playRemoteMove(x, y);
+    p.playRemoteMove(x, y);
 
-  this.tweens.add({
-    targets: p,
-    x,
-    y,
-    duration: 100, // slightly higher for smoothness
-    ease: "Linear",
-    onComplete: () => p.stopRemote(),
-  });
-}
-
+    this.tweens.add({
+      targets: p,
+      x,
+      y,
+      duration: 100, // slightly higher for smoothness
+      ease: "Linear",
+      onComplete: () => p.stopRemote(),
+    });
+  }
 
   removeRemotePlayer(userId: string) {
     this.remotePlayers.get(userId)?.destroy();
