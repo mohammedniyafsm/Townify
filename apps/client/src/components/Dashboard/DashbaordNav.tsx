@@ -82,7 +82,7 @@ function DashboardNav({ setCreateRoom, setJoinRoom }: DashboardNavProps) {
               <img
                 src="https://res.cloudinary.com/dnkenioua/image/upload/v1764999707/Group_ik1uap.png"
                 alt="Townify Logo"
-                className="h-8 w-8 md:h-10 md:w-10 transition-transform group-hover:scale-110"
+                className="h-4 w-4 md:h-6 md:w-6 transition-transform group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-sm group-hover:blur-md transition-all"></div>
             </div>

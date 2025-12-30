@@ -7,6 +7,7 @@ import {
   deleteAvatarRepo,
 } from "./avatars.repository.js";
 import { uploadToCloudinary } from "../../shared/services/cloudinary.service.js";
+import fs from 'fs'
 
 const avatarUpload = (path: string) =>
   uploadToCloudinary(path, { folder: "Townify/Avatar" });
@@ -26,7 +27,8 @@ export const uploadAvatarService = async (
   ]);
   if (!idleURL.success||!walkSheetURL.success) throw new Error("UPLOAD_FAILED");
  
-  
+  if(fs.existsSync(idle.path)) fs.unlinkSync(idle.path)
+  if(fs.existsSync(walkSheet.path)) fs.unlinkSync(walkSheet.path)  
   await cacheDel("avatars:list");
 
   return createAvatarRepo({
@@ -63,12 +65,14 @@ export const updateAvatarService = async (
     const uploadResult = await avatarUpload(idle.path);
     if (!uploadResult.success) throw new Error("UPLOAD_FAILED");
     data.idle = uploadResult.result?.secure_url;
+    if(fs.existsSync(idle.path)) fs.unlinkSync(idle.path)
   }
 
   if (walkSheet) {
     const uploadResult = await avatarUpload(walkSheet.path);
     if (!uploadResult.success) throw new Error("UPLOAD_FAILED");
     data.walkSheet = uploadResult.result?.secure_url;
+    if(fs.existsSync(walkSheet.path)) fs.unlinkSync(walkSheet.path)  
   }
 
   if (!Object.keys(data).length) throw new Error("NO_UPDATES");

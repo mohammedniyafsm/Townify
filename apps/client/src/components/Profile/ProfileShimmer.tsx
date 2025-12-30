@@ -45,7 +45,7 @@ export default function ProfileShimmer() {
         </div>
 
         {/* Game Avatar Section Shimmer */}
-        <div className="mt-6">
+        <div className="mt-1">
           <div className="flex items-center gap-2 mb-4">
             <div className="h-4 w-4 bg-muted rounded animate-pulse"></div>
             <div className="h-5 w-32 bg-muted rounded animate-pulse"></div>
@@ -63,7 +63,7 @@ export default function ProfileShimmer() {
         </div>
 
         {/* Action Buttons Shimmer */}
-        <div className="mt-8 flex gap-3 justify-end">
+        <div className="mt-0 flex gap-3 justify-end">
           <Button
             disabled
             variant="outline"

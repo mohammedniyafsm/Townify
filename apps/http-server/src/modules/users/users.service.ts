@@ -1,6 +1,7 @@
 import { cacheDel } from "@repo/cache/dist/index.js";
 import { uploadToCloudinary } from "../../shared/services/cloudinary.service.js";
 import { getUserById, updateUser } from "./users.repository.js";
+import fs from 'fs'
 
 export const getUserService = async (userId: string) => {
     const user = await getUserById(userId);
@@ -37,7 +38,7 @@ export const updateUserProfileService = async ({
         const { success, result } = await uploadToCloudinary(file.path, {
             folder: "townify/users",
         });
-
+        if(fs.existsSync(file.path)) fs.unlinkSync(file.path)
         if (!success) throw new Error("UPLOAD_FAILED");
 
         data.profile = result?.secure_url;

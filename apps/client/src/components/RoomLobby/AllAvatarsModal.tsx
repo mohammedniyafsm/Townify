@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Check, X } from "lucide-react";
 
@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { BorderBeam } from "../ui/border-beam";
 
 import type { RootState } from "@/Redux/stroe";
-import type { AllAvatarsModalI } from "@/types/type";
+import type { AllAvatarsModalI, Avatar } from "@/types/type";
 
 function AllAvatarsModal({
     currentAvatar,
@@ -17,13 +17,15 @@ function AllAvatarsModal({
 }: AllAvatarsModalI) {
     
     const { user } = useSelector((state: RootState) => state.user);
-    const [tempCurrent, settempCurrent] = useState(currentAvatar);
+    const [tempCurrent, settempCurrent] = useState<Avatar|null>(null);
 
     const handleSubmit = () => {
         setCurrentAvatars(tempCurrent);
         setModal(false);
     };
-
+    useEffect(()=>{
+        settempCurrent(currentAvatar)
+    },[currentAvatar])
     const handleCancel = () => {
         settempCurrent(currentAvatar);
         setModal(false)

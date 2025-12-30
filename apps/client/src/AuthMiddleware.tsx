@@ -5,6 +5,7 @@ import axios from "axios";
 import { userVerifyTokenApi } from "./api/authApi";
 import { adminVerifyTokenApi } from "./api/adminApi";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
+import { ProtectedLoading } from "./components/JoinRoom/Loading";
 
 
 export const ProtectedRoute = () => {
@@ -43,7 +44,7 @@ export const ProtectedRoute = () => {
   }, []);
 
   if (isAuthenticated === null) {
-    return <div><LoadingSpinner /></div>;
+    return <div><ProtectedLoading /></div>;
   }
   const redirectPath = encodeURIComponent(
       location.pathname + location.search
@@ -92,7 +93,7 @@ export const AdminProtectedRoute = () => {
   }, []);
 
   if (isAuthenticated === null) {
-    return <div><LoadingSpinner /></div>;
+    return <div><ProtectedLoading /></div>;
   }
 
   const redirectPath = encodeURIComponent(
