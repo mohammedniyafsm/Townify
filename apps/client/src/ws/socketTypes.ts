@@ -52,6 +52,11 @@ export type ServerMessage =
     payload: {
       userId: string;
     };
+  } | {
+    type: "SIT_REJECTED";
+    payload: {
+      chairId: string;
+    };
   };
 
 

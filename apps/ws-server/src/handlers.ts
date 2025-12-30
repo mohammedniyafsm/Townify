@@ -16,7 +16,8 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 if (!rooms.has(roomId)) {
                     rooms.set(roomId, {
                         users: new Map(),
-                        sockets: new Map()
+                        sockets: new Map(),
+                        chairs: new Map()
                     })
                 }
 
@@ -108,13 +109,24 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 const userId = (ws as any).userId;
                 const roomId = (ws as any).roomId;
 
-                if (!userId || !roomId || !chairId || !facing) return;
+                if (!userId || !roomId || chairId == null || !facing || typeof chairId !== "number") return;
 
                 const room = rooms.get(roomId);
                 if (!room) return;
 
+                if (room.chairs.has(chairId)) {
+                    ws.send(JSON.stringify({
+                        type: "SIT_REJECTED",
+                        payload: { chairId }
+                    }));
+                    return;
+                }
+
                 const user = room.users.get(userId);
                 if (!user) return;
+
+                // 🔒 lock chair
+                room.chairs.set(chairId, userId);
 
                 user.isSitting = true;
                 user.chairId = chairId;
@@ -124,13 +136,8 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                     room.sockets,
                     {
                         type: "USER_SIT",
-                        payload: {
-                            userId,
-                            chairId,
-                            facing,
-                        },
+                        payload: { userId, chairId, facing },
                     },
-                    userId
                 );
 
                 break;
@@ -148,6 +155,10 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 const user = room.users.get(userId);
                 if (!user) return;
 
+                if (user.chairId != null) {
+                    room.chairs.delete(user.chairId); // 🔓 unlock chair
+                }
+
                 user.isSitting = false;
                 user.chairId = null;
                 user.facing = null;
@@ -163,6 +174,7 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
 
                 break;
             }
+
         }
     } catch (error) {
         console.error("Invalid JSON from client");
@@ -178,6 +190,11 @@ export const handleDisconnect = (ws: WebSocket) => {
 
     const room = rooms.get(roomId);
     if (!room) return;
+
+    const user = room.users.get(userId);
+    if (user?.chairId != null) {
+        room.chairs.delete(user.chairId);
+    }
 
     room.users.delete(userId);
     room.sockets.delete(userId);

@@ -1,5 +1,6 @@
 import Phaser from "phaser";
-import { sendMove } from "@/ws/socketHandlers";
+import { sendMove, sendSit, sendStand } from "@/ws/socketHandlers";
+import { parseTiledValue } from "../utils/utils";
 
 type Direction = "up" | "down" | "left" | "right";
 
@@ -23,6 +24,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   private bg: Phaser.GameObjects.Graphics;
 
   private readonly BASE_FONT_SIZE = 10;
+
 
   constructor(
     scene: Phaser.Scene,
@@ -88,10 +90,28 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     ) {
       if (this.isSitting) {
         this.standUp();
+        sendStand(); // 🔥 notify server
       } else {
         const chair = (this.scene as any).getNearbyChair(this);
-        if (chair) this.sit(chair);
+
+        if (chair) {
+          const facingProp = chair.properties?.find(
+            (p: any) => p.name === "facing"
+          );
+          const chairIdProp = chair.properties?.find(
+            (p: any) => p.name === "chairId"
+          );
+
+          if (!facingProp || !chairIdProp) return;
+
+          const facing = parseTiledValue(facingProp.value) as Direction;
+          const chairId = Number(parseTiledValue(chairIdProp.value));
+
+          sendSit(chairId, facing); // ✅ only request
+        }
+
       }
+
     }
 
     // -------- MOVEMENT --------
@@ -226,7 +246,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.stop();
     this.setFrame(Player.IDLE_FRAMES[this.lastDirection]);
   }
-
 
   /* ---------------- HELPERS ---------------- */
 

@@ -4,6 +4,9 @@ import CameraController from "../camera/CameraController";
 import { setMainScene } from "./sceneRegistry";
 import { flushPendingMessages } from "@/ws/socketHandlers";
 import type { AvatarSchema, PlayerIdentity } from "@/types/type";
+import { parseTiledValue } from "../utils/utils";
+
+
 
 export default class MainScene extends Phaser.Scene {
   private mapUrl: string;
@@ -46,7 +49,7 @@ export default class MainScene extends Phaser.Scene {
       rect.setVisible(false);
     });
   }
-  
+
   private chairZones: Phaser.Types.Tilemaps.TiledObject[] = [];
 
 
@@ -193,21 +196,35 @@ export default class MainScene extends Phaser.Scene {
   }
 
   remoteSit(userId: string, chairId: number, facing: string) {
-    const player = this.remotePlayers.get(userId);
+    const player = this.isLocalUser(userId)
+      ? this.localPlayer
+      : this.remotePlayers.get(userId);
+
     if (!player) return;
 
-    const chair = this.chairZones.find(c => c.id === chairId);
-    if (!chair) return;
+    const chair = this.chairZones.find(obj =>
+      obj.properties?.some((p: any) =>
+        p.name === "chairId" &&
+        Number(parseTiledValue(p.value)) === chairId
+      )
+    );
+
+    if (!chair) {
+      console.warn("Chair not found for chairId:", chairId);
+      return;
+    }
 
     player.sit(chair);
   }
 
-  remoteStand(userId: string) {
-    const player = this.remotePlayers.get(userId);
-    if (!player) return;
+  remoteStand(userId: any) {
+    const player = this.isLocalUser(userId)
+      ? this.localPlayer
+      : this.remotePlayers.get(userId);
 
-    player.standUp();
+    player?.standUp();
   }
+
 
   // 🔥 IMPORTANT FIX: animations PER avatar
   private createAvatarAnimations() {

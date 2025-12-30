@@ -13,7 +13,8 @@ interface UserI {
 
 export type RoomI = {
   users : Map<String,UserI>,
-  sockets : Map<string,WebSocket>
+  sockets : Map<string,WebSocket>,
+  chairs:  Map<number, string>,
 }
 
 export interface MessageI<T = any> {
