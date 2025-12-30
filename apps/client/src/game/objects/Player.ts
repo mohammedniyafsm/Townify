@@ -24,6 +24,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   private bg: Phaser.GameObjects.Graphics;
 
   private readonly BASE_FONT_SIZE = 10;
+  private seatBlocker?: Phaser.GameObjects.Rectangle;
 
 
   constructor(
@@ -43,7 +44,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     this.setOrigin(0.5, 1);
-    this.setDepth(10);
+    this.setDepth(this.y);
     this.setCollideWorldBounds(true);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
@@ -88,9 +89,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.interactKey &&
       Phaser.Input.Keyboard.JustDown(this.interactKey)
     ) {
+      // 🛑 HARD STOP EVERYTHING THIS FRAME
+      body.setVelocity(0, 0);
+
       if (this.isSitting) {
         this.standUp();
-        sendStand(); // 🔥 notify server
+        sendStand();
       } else {
         const chair = (this.scene as any).getNearbyChair(this);
 
@@ -107,10 +111,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
           const facing = parseTiledValue(facingProp.value) as Direction;
           const chairId = Number(parseTiledValue(chairIdProp.value));
 
-          sendSit(chairId, facing); // ✅ only request
+          sendSit(chairId, facing);
         }
-
+        return; // 🔥🔥 THIS IS THE FIX 🔥🔥
       }
+
 
     }
 
@@ -184,32 +189,43 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   sit(chair: Phaser.Types.Tilemaps.TiledObject) {
     if (this.isSitting) return;
 
-    const facingProp = chair.properties?.find(
-      (p: any) => p.name === "facing"
-    );
+    this.isSitting = true;
 
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocity(0, 0);
+    body.moves = false;
+
+    // parse facing
+    const facingProp = chair.properties?.find((p : any) => p.name === "facing");
     let facingRaw = String(facingProp?.value ?? "down");
     const facing = facingRaw.includes("Value:")
       ? facingRaw.split("Value:")[1].trim()
       : facingRaw;
-
-    this.isSitting = true;
-
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(0);
-    body.enable = false;
 
     const offset = Player.SIT_OFFSETS[facing] ?? { x: 0, y: 0 };
 
     const baseX = chair.x! + (chair.width ?? 0) / 2;
     const baseY = chair.y! + (chair.height ?? 0) / 2;
 
-    this.setPosition(
-      baseX + offset.x,
-      baseY + offset.y
+    this.setPosition(baseX + offset.x, baseY + offset.y);
+    this.setFrame(Player.SIT_FRAMES[facing]);
+
+    // 🔥 CREATE INVISIBLE BLOCKER
+    const blocker = this.scene.add.rectangle(
+      this.x,
+      this.y - 10, // slightly above feet
+      24,
+      20
     );
 
-    this.setFrame(Player.SIT_FRAMES[facing]);
+    this.scene.physics.add.existing(blocker, true);
+
+    // add blocker to SAME collision group as walls
+    (this.scene as any).collisionGroup.add(blocker);
+
+    blocker.setVisible(false);
+
+    this.seatBlocker = blocker;
   }
 
   standUp() {
@@ -218,9 +234,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.isSitting = false;
 
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.enable = true;
+    body.setVelocity(0, 0);
+    body.moves = true;
 
-    this.y += 6;
+    this.y += 8;
+
+    // 🔥 REMOVE BLOCKER
+    if (this.seatBlocker) {
+      this.seatBlocker.destroy();
+      this.seatBlocker = undefined;
+    }
   }
 
   /* ---------------- REMOTE MOVEMENT ---------------- */

@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import axios from "axios";
 import { userVerifyTokenApi } from "./api/authApi";
 import { adminVerifyTokenApi } from "./api/adminApi";
-import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 import { ProtectedLoading } from "./components/JoinRoom/Loading";
 
 

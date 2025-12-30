@@ -28,7 +28,7 @@ function process(scene: any, message: ServerMessage) {
 
     case "ROOM_STATE":
       message.payload.forEach((u: any) => {
-        const player = scene.isLocalUser(u.userId)
+         scene.isLocalUser(u.userId)
           ? scene.spawnLocalPlayer(u)
           : scene.addRemotePlayer(u);
 

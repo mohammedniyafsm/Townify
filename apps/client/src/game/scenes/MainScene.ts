@@ -12,6 +12,7 @@ export default class MainScene extends Phaser.Scene {
   private mapUrl: string;
   private avatarMap: Record<string, AvatarSchema>;
   private localPlayerInfo: PlayerIdentity;
+  private playerGroup!: Phaser.Physics.Arcade.Group;
 
   private localPlayer?: Player;
   private remotePlayers = new Map<string, Player>();
@@ -72,7 +73,7 @@ export default class MainScene extends Phaser.Scene {
     this.load.tilemapTiledJSON("map", this.mapUrl);
 
     TILESETS.forEach(key => {
-      this.load.image(key, `/tiles/${key}.png`);
+      this.load.image(key, `/tiles/${key}.png`)
     });
 
     // load ALL avatar spritesheets
@@ -104,6 +105,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.loadObjectCollisionLayer(map, "collision");
     this.loadObjectCollisionLayer(map, "furniture-collision");
+    this.playerGroup = this.physics.add.group();
 
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -138,6 +140,7 @@ export default class MainScene extends Phaser.Scene {
       user.name,
       true
     );
+    this.playerGroup.add(this.localPlayer);
     this.physics.add.collider(this.localPlayer, this.collisionGroup);
     this.cameras.main.startFollow(this.localPlayer, true, 0.1, 0.1);
   }
@@ -153,7 +156,7 @@ export default class MainScene extends Phaser.Scene {
       user.name,
       false
     );
-
+    this.playerGroup.add(p);
     this.remotePlayers.set(user.userId, p);
   }
 
@@ -195,7 +198,7 @@ export default class MainScene extends Phaser.Scene {
     });
   }
 
-  remoteSit(userId: string, chairId: number, facing: string) {
+  remoteSit(userId: string, chairId: number) {
     const player = this.isLocalUser(userId)
       ? this.localPlayer
       : this.remotePlayers.get(userId);
