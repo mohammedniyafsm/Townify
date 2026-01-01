@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 import Player from "../objects/Player";
 import CameraController from "../camera/CameraController";
-import { setMainScene } from "./sceneRegistry";
-import { flushPendingMessages } from "@/ws/socketHandlers";
+import { setMainScene, setCurrentSpace } from "./sceneRegistry";
+import { flushPendingMessages, sendJoinSpace, sendLeaveSpace } from "@/ws/socketHandlers";
 import type { AvatarSchema, PlayerIdentity } from "@/types/type";
 import { parseTiledValue } from "../utils/utils";
 
@@ -52,6 +52,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private chairZones: Phaser.Types.Tilemaps.TiledObject[] = [];
+  private spaces: Phaser.Types.Tilemaps.TiledObject[] = [];
+  private currentSpaceId: string | null = null;
 
 
   constructor(
@@ -119,6 +121,11 @@ export default class MainScene extends Phaser.Scene {
       this.chairZones = chairLayer.objects;
     }
 
+    const spaceLayer = map.getObjectLayer("spaces");
+    if (spaceLayer) {
+      this.spaces = spaceLayer.objects;
+    }
+
     new CameraController(this, map.widthInPixels, map.heightInPixels);
 
     flushPendingMessages();
@@ -126,7 +133,28 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     this.localPlayer?.update();
-    for (const p of this.remotePlayers.values()) p.update();
+
+    if (this.localPlayer) {
+      const space = this.getSpaceAt(
+        this.localPlayer.x,
+        this.localPlayer.y
+      );
+
+      const spaceId = space
+        ? String(
+          space.properties?.find((p : any) => p.name === "roomId")?.value
+        )
+        : null;
+
+      if (spaceId !== this.currentSpaceId) {
+        this.currentSpaceId = spaceId;
+        this.onSpaceChanged(space);
+      }
+    }
+
+    for (const p of this.remotePlayers.values()) {
+      p.update();
+    }
   }
 
   spawnLocalPlayer(user: any) {
@@ -226,6 +254,44 @@ export default class MainScene extends Phaser.Scene {
       : this.remotePlayers.get(userId);
 
     player?.standUp();
+  }
+
+  getSpaceAt(x: number, y: number) {
+    return this.spaces.find(space => {
+      if (
+        space.x == null ||
+        space.y == null ||
+        space.width == null ||
+        space.height == null
+      ) {
+        return false;
+      }
+
+      return (
+        x >= space.x &&
+        x <= space.x + space.width &&
+        y >= space.y &&
+        y <= space.y + space.height
+      );
+    });
+  }
+
+  onSpaceChanged(space?: Phaser.Types.Tilemaps.TiledObject) {
+    if (!space) {
+      sendLeaveSpace();
+      setCurrentSpace(null);
+      return;
+    }
+
+    const spaceId = String(
+      space.properties?.find((p: any) => p.name === "roomId")?.value
+    );
+    const name = String(
+      space.properties?.find((p: any) => p.name === "name")?.value
+    );
+
+    sendJoinSpace(spaceId);
+    setCurrentSpace({ id: spaceId, name });
   }
 
 

@@ -6,7 +6,7 @@ export const connectSocket = (
   name: string,
   avatarId: string
 ) => {
-  if (socket && socket.readyState === WebSocket.OPEN) {
+  if (socket) {
     return socket;
   }
 
