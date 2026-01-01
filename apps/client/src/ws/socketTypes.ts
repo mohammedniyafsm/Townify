@@ -57,6 +57,13 @@ export type ServerMessage =
     payload: {
       chairId: string;
     };
+  } | {
+    type: "SPACE_CHAT";
+    payload: {
+      spaceId: string;
+      userId: string;
+      text: string;
+    };
   };
 
 

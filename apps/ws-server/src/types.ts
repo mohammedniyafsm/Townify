@@ -15,6 +15,7 @@ export type RoomI = {
   users : Map<String,UserI>,
   sockets : Map<string,WebSocket>,
   chairs:  Map<number, string>,
+  spaces : Map<string,Set<string>>
 }
 
 export interface MessageI<T = any> {

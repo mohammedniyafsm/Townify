@@ -14,14 +14,11 @@ export const useSocket = (
     const socket = connectSocket(roomId, userId, name, avatarId);
 
     socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      console.log("📡 Socket:", message);
-      handleSocketMessage(message);
+      handleSocketMessage(JSON.parse(event.data));
     };
 
     return () => {
-      disconnectSocket(roomId, userId);
+      disconnectSocket();
     };
-  }, [roomId, userId, name, avatarId]);
+  }, [roomId]);
 };
- 

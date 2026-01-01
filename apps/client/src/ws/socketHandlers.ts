@@ -1,6 +1,7 @@
 import { getMainScene } from "@/game/scenes/sceneRegistry";
 import type { ServerMessage } from "./socketTypes";
 import { getSocket } from "./socket";
+import { pushMessage } from "@/hooks/useSpaceChat";
 
 let pending: ServerMessage[] = [];
 
@@ -28,7 +29,7 @@ function process(scene: any, message: ServerMessage) {
 
     case "ROOM_STATE":
       message.payload.forEach((u: any) => {
-         scene.isLocalUser(u.userId)
+        scene.isLocalUser(u.userId)
           ? scene.spawnLocalPlayer(u)
           : scene.addRemotePlayer(u);
 
@@ -79,6 +80,11 @@ function process(scene: any, message: ServerMessage) {
     case "SIT_REJECTED":
       console.warn("Chair already occupied:", message.payload.chairId);
       break;
+
+    case "SPACE_CHAT":
+      pushMessage(message.payload);
+      break;
+
   }
 }
 
@@ -114,6 +120,42 @@ export const sendStand = () => {
     JSON.stringify({
       type: "STAND",
       payload: {},
+    })
+  );
+};
+
+export const sendJoinSpace = (spaceId: string) => {
+  const socket = getSocket();
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+  socket.send(
+    JSON.stringify({
+      type: "JOIN_SPACE",
+      payload: { spaceId },
+    })
+  );
+};
+
+export const sendLeaveSpace = () => {
+  const socket = getSocket();
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+  socket.send(
+    JSON.stringify({
+      type: "LEAVE_SPACE",
+      payload: {},
+    })
+  );
+};
+
+export const sendSpaceChat = (text: string) => {
+  const socket = getSocket();
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+  socket.send(
+    JSON.stringify({
+      type: "SPACE_CHAT",
+      payload: { text },
     })
   );
 };

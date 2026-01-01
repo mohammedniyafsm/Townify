@@ -27,6 +27,7 @@ import AvatarPage from "./pages/Admin/Avatar/Avatars";
 import { fetchUserSpacesThunk } from "./Redux/Slice/UserSpace/UserSpaceThunk";
 import { AdminProtectedRoute, ProtectedRoute } from "./AuthMiddleware";
 import Profile from "./pages/Profile";
+import ChatText from "./components/Map/ChatText";
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -71,6 +72,7 @@ function App() {
             <Route path="/invite/:slug" element={<InviteMembers />} />
             <Route path="/lobby/:slug" element={<RoomLobby />} />
             <Route path="/space/:slug" element={<Space />} />
+            <Route path="/map" element={<ChatText />} />
           </Route>
 
           <Route element={<AdminProtectedRoute />}>

@@ -4,12 +4,13 @@ import { useSelector } from "react-redux";
 
 import Game from "../game/Game";
 import Navbar from "@/components/invite/Navbar";
-import {LoadingSpace} from "@/components/JoinRoom/Loading";
+import { LoadingSpace } from "@/components/JoinRoom/Loading";
 import BlockedUser from "@/components/JoinRoom/BlockedUser";
 import SpaceNotFound from "@/components/JoinRoom/SpaceNotFound";
 
 import { fetchSpaceBySlug, checkSpaceAccess } from "@/api/SpaceApi";
 import { useSocket } from "@/hooks/useSocket";
+import SpaceChatPanel from "@/components/Map/SpaceChatPanel";
 
 import type { RootState } from "@/Redux/stroe";
 import type { AvatarSchema } from "@/types/type";
@@ -114,9 +115,9 @@ export default function Space() {
         </div>
       )}
 
-     
+
       {state === "allowed" && mapUrl && spaceId && user && (
-        <div className="w-screen h-screen">
+        <div className="w-screen h-screen relative">
           <Game
             mapUrl={mapUrl}
             avatarMap={avatarMap}
@@ -127,6 +128,9 @@ export default function Space() {
               avatarId: user.avatarId!,
             }}
           />
+
+          {/* 🔥 CHAT OVERLAY */}
+          <SpaceChatPanel />
         </div>
       )}
     </div>
