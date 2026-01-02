@@ -40,6 +40,8 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 (ws as any).userId = userId;
                 (ws as any).roomId = roomId;
                 (ws as any).spaceId = null;
+                (ws as any).name = name;
+                (ws as any).avatarId = avatarId;
 
                 room.sockets.set(userId, ws);
 
@@ -67,6 +69,7 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
             case "USER_MOVE": {
                 const roomId = (ws as any).roomId;
                 const userId = (ws as any).userId;
+                const name = (ws as any).name;
 
                 const room = rooms.get(roomId);
                 if (!room || !userId || typeof x !== "number" || typeof y !== "number") return;
@@ -78,7 +81,7 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
 
                 brodCastRoom(room.sockets, {
                     type: "USER_MOVED",
-                    payload: { userId, x, y }
+                    payload: { userId, name, x, y }
                 }, userId)
                 break;
             }
@@ -87,6 +90,7 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 const userId = (ws as any).userId;
                 const roomId = (ws as any).roomId;
                 const spaceId = (ws as any).spaceId;
+                const name = (ws as any).name;
 
                 const room = rooms.get(roomId);
                 if (!room) return;
@@ -104,7 +108,8 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 brodCastRoom(room.sockets, {
                     type: "USER_LEFT",
                     payload: {
-                        userId: userId
+                        userId: userId,
+                        name: name
                     }
                 })
                 if (room.users.size === 0) {
@@ -116,6 +121,7 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
             case "SIT": {
                 const userId = (ws as any).userId;
                 const roomId = (ws as any).roomId;
+                const name = (ws as any).name;
 
                 if (!userId || !roomId || chairId == null || !facing || typeof chairId !== "number") return;
 
@@ -154,6 +160,7 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
             case "STAND": {
                 const userId = (ws as any).userId;
                 const roomId = (ws as any).roomId;
+                const name = (ws as any).name;
 
                 if (!userId || !roomId) return;
 
@@ -175,7 +182,7 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                     room.sockets,
                     {
                         type: "USER_STAND",
-                        payload: { userId },
+                        payload: { userId, name },
                     },
                     userId
                 );
@@ -186,6 +193,7 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
             case "JOIN_SPACE": {
                 const userId = (ws as any).userId;
                 const roomId = (ws as any).roomId;
+                const name = (ws as any).name;
                 const { spaceId } = payload;
 
                 if (!userId || !roomId || !spaceId) return;
@@ -193,13 +201,11 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 const room = rooms.get(roomId);
                 if (!room) return;
 
-                // 🔁 Leave previous space
                 const prevSpaceId = (ws as any).spaceId;
                 if (prevSpaceId) {
                     room.spaces.get(prevSpaceId)?.delete(userId);
                 }
 
-                // ➕ Join new space
                 if (!room.spaces.has(spaceId)) {
                     room.spaces.set(spaceId, new Set());
                 }
@@ -207,19 +213,49 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 room.spaces.get(spaceId)!.add(userId);
                 (ws as any).spaceId = spaceId;
 
+                const usersInSpace = room.spaces.get(spaceId);
+
+                usersInSpace?.forEach((uid) => {
+                    const socket = room.sockets.get(uid);
+                    socket?.send(JSON.stringify({
+                        type: "USER_JOINED_SPACE",
+                        payload: {
+                            userId,
+                            name,
+                            spaceId,
+                        }
+                    }));
+                })
+
                 break;
             }
 
             case "LEAVE_SPACE": {
+
                 const userId = (ws as any).userId;
                 const roomId = (ws as any).roomId;
+                const name = (ws as any).name;
+                const spaceId = (ws as any).spaceId;
 
                 if (!userId || !roomId) return;
 
                 const room = rooms.get(roomId);
                 if (!room) return;
 
-                const spaceId = (ws as any).spaceId;
+                const usersInSpace = room.spaces.get(spaceId);
+
+                usersInSpace?.forEach((uid) => {
+                    const socket = room.sockets.get(uid);
+                    socket?.send(JSON.stringify({
+                        type: "USER_LEAVED_SPACE",
+                        payload: {
+                            userId,
+                            name,
+                            spaceId,
+                        }
+                    }))
+                });
+
                 if (spaceId) {
                     room.spaces.get(spaceId)?.delete(userId);
                     (ws as any).spaceId = null;
@@ -232,6 +268,9 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 const userId = (ws as any).userId;
                 const roomId = (ws as any).roomId;
                 const spaceId = (ws as any).spaceId;
+                const name = (ws as any).name;
+                const avatarId = (ws as any).avatarId ;
+
                 const { text } = payload;
 
                 if (!userId || !roomId || !spaceId || !text) return;
@@ -251,6 +290,9 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                                 userId,
                                 text,
                                 spaceId,
+                                name,
+                                timestamp: Date.now(),
+                                avatarId,
                             }
                         }));
                     }

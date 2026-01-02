@@ -107,7 +107,7 @@ export default function ProfileCard() {
         }}
       /> */}
 
-        <div className="relative z-10">
+        <div className="relative z-10 ">
             <BorderBeam></BorderBeam>
       <Card className="p-5 ">
         <div className="text-center mb-1">

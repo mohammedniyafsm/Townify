@@ -1,3 +1,4 @@
+
 export type ServerMessage =
   | {
     type: "ROOM_STATE";
@@ -63,6 +64,9 @@ export type ServerMessage =
       spaceId: string;
       userId: string;
       text: string;
+      name : string;
+      avatarId : string;
+      timestamp : number;
     };
   };
 

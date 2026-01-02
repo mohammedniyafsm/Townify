@@ -4,6 +4,9 @@ export type ChatMessage = {
   userId: string;
   text: string;
   spaceId: string;
+  name: string;
+  avatarId: string; 
+  timestamp: number; 
 };
 
 let listeners: ((m: ChatMessage) => void)[] = [];
