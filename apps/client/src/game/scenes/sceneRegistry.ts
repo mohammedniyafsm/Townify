@@ -8,10 +8,8 @@ export const setMainScene = (scene: MainScene | null) => {
 
 export const getMainScene = () => mainScene;
 
-// 🔥 SPACE STATE
 let currentSpace: { id: string; name: string } | null = null;
 
-// 🔥 listeners
 let listeners: ((space: typeof currentSpace) => void)[] = [];
 
 export const setCurrentSpace = (space: typeof currentSpace) => {
@@ -21,7 +19,6 @@ export const setCurrentSpace = (space: typeof currentSpace) => {
 
 export const getCurrentSpace = () => currentSpace;
 
-// 🔥 React subscribes here
 export const subscribeToSpace = (
   cb: (space: typeof currentSpace) => void
 ) => {

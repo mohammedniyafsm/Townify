@@ -2,6 +2,7 @@ import { getMainScene } from "@/game/scenes/sceneRegistry";
 import type { ServerMessage } from "./socketTypes";
 import { getSocket } from "./socket";
 import { pushMessage } from "@/hooks/useSpaceChat";
+import { MAIN_SPACE } from "@/components/Space-Chat/constants";
 
 let pending: ServerMessage[] = [];
 
@@ -85,6 +86,13 @@ function process(scene: any, message: ServerMessage) {
       pushMessage(message.payload);
       break;
 
+    case "ROOM_CHAT":
+      pushMessage({
+        ...message.payload,
+        spaceId: MAIN_SPACE.id,
+      });
+      break;
+
   }
 }
 
@@ -152,10 +160,19 @@ export const sendSpaceChat = (text: string) => {
   const socket = getSocket();
   if (!socket || socket.readyState !== WebSocket.OPEN) return;
 
-  socket.send(
-    JSON.stringify({
-      type: "SPACE_CHAT",
-      payload: { text },
-    })
-  );
+  socket.send(JSON.stringify({
+    type: "SPACE_CHAT",
+    payload: { text },
+  }));
 };
+
+export const sendRoomChat = (text: string) => {
+  const socket = getSocket();
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+  socket.send(JSON.stringify({
+    type: "ROOM_CHAT",
+    payload: { text },
+  }));
+};
+;

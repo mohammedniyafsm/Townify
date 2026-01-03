@@ -9,17 +9,13 @@ interface GameProps {
   localPlayer: PlayerIdentity;
 }
 
-export default function Game({
-  mapUrl,
-  avatarMap,
-  localPlayer,
-}: GameProps) {
+export default function Game({ mapUrl, avatarMap, localPlayer }: GameProps) {
   const gameRef = useRef<Phaser.Game | null>(null);
 
   useEffect(() => {
     if (gameRef.current) return;
 
-    console.log("How many time render ")
+    console.log("🔥 Phaser created once");
 
     gameRef.current = new Phaser.Game(
       createConfig(mapUrl, avatarMap, localPlayer)
@@ -29,8 +25,7 @@ export default function Game({
       gameRef.current?.destroy(true);
       gameRef.current = null;
     };
-  }, [mapUrl]);
+  }, [mapUrl, avatarMap, localPlayer]);
 
   return <div id="game-container" />;
 }
-

@@ -5,8 +5,8 @@ export type ChatMessage = {
   text: string;
   spaceId: string;
   name: string;
-  avatarId: string; 
-  timestamp: number; 
+  avatarId: string;
+  timestamp: number;
 };
 
 let listeners: ((m: ChatMessage) => void)[] = [];
@@ -24,7 +24,6 @@ export const useSpaceChat = () => {
     };
 
     listeners.push(add);
-
     return () => {
       listeners = listeners.filter(l => l !== add);
     };
@@ -32,4 +31,3 @@ export const useSpaceChat = () => {
 
   return messages;
 };
-

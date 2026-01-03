@@ -264,13 +264,40 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 break;
             }
 
+            case "ROOM_CHAT": {
+                const userId = (ws as any).userId;
+                const roomId = (ws as any).roomId;
+                const name = (ws as any).name;
+                const avatarId = (ws as any).avatarId;
+                const { text } = payload;
+
+                if (!userId || !roomId || !name || !text || !avatarId) return;
+
+                const room = rooms.get(roomId);
+
+                if (!room) return;
+
+                if (!room.users.has(userId)) return;
+
+                brodCastRoom(room.sockets, {
+                    type: "ROOM_CHAT",
+                    payload: {
+                        userId,
+                        name,
+                        avatarId,
+                        text,
+                        timestamp: Date.now()
+                    }
+                });
+                break;
+            }
+
             case "SPACE_CHAT": {
                 const userId = (ws as any).userId;
                 const roomId = (ws as any).roomId;
                 const spaceId = (ws as any).spaceId;
                 const name = (ws as any).name;
-                const avatarId = (ws as any).avatarId ;
-
+                const avatarId = (ws as any).avatarId;
                 const { text } = payload;
 
                 if (!userId || !roomId || !spaceId || !text) return;
@@ -278,25 +305,30 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 const room = rooms.get(roomId);
                 if (!room) return;
 
+                if (!room.users.has(userId)) return;
+
                 const usersInSpace = room.spaces.get(spaceId);
                 if (!usersInSpace) return;
 
+                if (!usersInSpace.has(userId)) return;
+
                 usersInSpace.forEach(uid => {
                     const socket = room.sockets.get(uid);
-                    if (socket && socket.readyState === WebSocket.OPEN) {
-                        socket?.send(JSON.stringify({
+                    if (socket?.readyState === WebSocket.OPEN) {
+                        socket.send(JSON.stringify({
                             type: "SPACE_CHAT",
                             payload: {
                                 userId,
+                                name,
+                                avatarId,
                                 text,
                                 spaceId,
-                                name,
                                 timestamp: Date.now(),
-                                avatarId,
                             }
                         }));
                     }
                 });
+
                 break;
             }
 
