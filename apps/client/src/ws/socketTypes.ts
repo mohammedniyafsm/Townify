@@ -68,6 +68,16 @@ export type ServerMessage =
       avatarId : string;
       timestamp : number;
     };
+  } | {
+    type: "ROOM_CHAT";
+    payload: {
+      spaceId: string;
+      userId: string;
+      text: string;
+      name : string;
+      avatarId : string;
+      timestamp : number;
+    };
   };
 
 
