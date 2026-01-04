@@ -1,8 +1,8 @@
-import {Redis} from '@upstash/redis'
+import { Redis } from '@upstash/redis'
 
-const redis=new Redis({
-    url:process.env.UPSTASH_REDIS_REST_URL!,
-    token:process.env.UPSTASH_REDIS_REST_TOKEN!
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!
 })
 
 
@@ -17,11 +17,9 @@ export async function cacheGet<T>(key: string): Promise<T | null> {
   return redis.get<T>(key);
 }
 
-
 export async function cacheDel(key: string) {
   return redis.del(key);
 }
-
 
 // const data = await cacheWrap("users:list", 300, async () => {
 //   return db.user.findMany();
@@ -39,4 +37,5 @@ export async function cacheWrap<T>(
   return fresh;
 }
 
-export {redis}
+export { redis }
+export * from "./chat.redis.js";

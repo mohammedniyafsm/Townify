@@ -13,7 +13,6 @@ export default function GameControls({
     totalMembers,
     isChatOpen,
     onToggleChat,
-    gameSlug
 }: Props) {
     const navigate = useNavigate();
     const [micOn, setMicOn] = useState(true);

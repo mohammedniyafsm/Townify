@@ -1,7 +1,7 @@
 import { getMainScene } from "@/game/scenes/sceneRegistry";
 import type { ServerMessage } from "./socketTypes";
 import { getSocket } from "./socket";
-import { pushMessage } from "@/hooks/useSpaceChat";
+import { pushMessage, bulkAddMessages } from "@/hooks/useSpaceChat";
 import { MAIN_SPACE } from "@/components/Space-Chat/constants";
 
 let pending: ServerMessage[] = [];
@@ -26,6 +26,7 @@ export const flushPendingMessages = () => {
 };
 
 function process(scene: any, message: ServerMessage) {
+  console.log("WS Received:", message.type, message);
   switch (message.type) {
 
     case "ROOM_STATE":
@@ -83,14 +84,26 @@ function process(scene: any, message: ServerMessage) {
       break;
 
     case "SPACE_CHAT":
+      console.log("Processing SPACE_CHAT");
       pushMessage(message.payload);
       break;
 
     case "ROOM_CHAT":
+      console.log("Processing ROOM_CHAT");
       pushMessage({
         ...message.payload,
         spaceId: MAIN_SPACE.id,
       });
+      break;
+
+    case "SPACE_CHAT_HISTORY":
+      console.log("Processing SPACE_CHAT_HISTORY", message.payload.history.length);
+      bulkAddMessages(message.payload.history);
+      break;
+
+    case "ROOM_CHAT_HISTORY":
+      console.log("Processing ROOM_CHAT_HISTORY", message.payload.history.length);
+      bulkAddMessages(message.payload.history);
       break;
 
   }
@@ -162,17 +175,17 @@ export const sendSpaceChat = (text: string) => {
 
   socket.send(JSON.stringify({
     type: "SPACE_CHAT",
-    payload: { text },
+    payload: { text, timestamp: Date.now() },
   }));
 };
 
-export const sendRoomChat = (text: string) => {
+export const sendRoomChat = (text: string, userId: string, name: string, avatarId: string) => {
   const socket = getSocket();
   if (!socket || socket.readyState !== WebSocket.OPEN) return;
 
   socket.send(JSON.stringify({
     type: "ROOM_CHAT",
-    payload: { text },
+    payload: { text, userId, name, avatarId, timestamp: Date.now() },
   }));
 };
 ;

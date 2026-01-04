@@ -1,9 +1,15 @@
 import WebSocket from "ws";
 import type { BroadcastMessage, MessageI } from "./types.js";
 import { rooms } from "./room.js";
+import {
+    addRoomMessage,
+    getRoomMessages,
+    handleUserJoinRoom,
+    handleUserLeaveRoom,
+} from "@repo/cache"
 
 
-export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
+export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData) => {
     try {
 
         const { type, payload } = JSON.parse(rawMessage.toString()) as MessageI;
@@ -26,6 +32,8 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
 
                 if (!room) return;
 
+                if (room.users.has(userId)) return;
+
                 room.users.set(userId, {
                     userId,
                     name,
@@ -45,10 +53,22 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
 
                 room.sockets.set(userId, ws);
 
+                await handleUserJoinRoom(roomId, userId);
+                const history = await getRoomMessages(roomId);
+
                 ws.send(JSON.stringify({
                     type: "ROOM_STATE",
                     payload: Array.from(room.users.values())
                 }))
+
+                ws.send(
+                    JSON.stringify({
+                        type: "ROOM_CHAT_HISTORY",
+                        payload: {
+                            history,
+                        },
+                    })
+                );
 
                 brodCastRoom(room.sockets, {
                     type: "USER_JOINED",
@@ -104,6 +124,8 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
 
                 delete (ws as any).userId;
                 delete (ws as any).roomId;
+
+                await handleUserLeaveRoom(roomId, userId);
 
                 brodCastRoom(room.sockets, {
                     type: "USER_LEFT",
@@ -215,6 +237,19 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
 
                 const usersInSpace = room.spaces.get(spaceId);
 
+                await handleUserJoinRoom(roomId, userId, spaceId);
+
+                const history = await getRoomMessages(roomId, 50, spaceId);
+
+                ws.send(
+                    JSON.stringify({
+                        type: "SPACE_CHAT_HISTORY",
+                        payload: {
+                            history,
+                        },
+                    })
+                );
+
                 usersInSpace?.forEach((uid) => {
                     const socket = room.sockets.get(uid);
                     socket?.send(JSON.stringify({
@@ -231,7 +266,6 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
             }
 
             case "LEAVE_SPACE": {
-
                 const userId = (ws as any).userId;
                 const roomId = (ws as any).roomId;
                 const name = (ws as any).name;
@@ -243,6 +277,8 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
                 if (!room) return;
 
                 const usersInSpace = room.spaces.get(spaceId);
+
+                await handleUserLeaveRoom(roomId, userId, spaceId);
 
                 usersInSpace?.forEach((uid) => {
                     const socket = room.sockets.get(uid);
@@ -279,14 +315,18 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
 
                 if (!room.users.has(userId)) return;
 
+                const message = await addRoomMessage(
+                    roomId,
+                    userId,
+                    name,
+                    avatarId,
+                    text
+                );
+
                 brodCastRoom(room.sockets, {
                     type: "ROOM_CHAT",
                     payload: {
-                        userId,
-                        name,
-                        avatarId,
-                        text,
-                        timestamp: Date.now()
+                        ...message,
                     }
                 });
                 break;
@@ -312,18 +352,22 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
 
                 if (!usersInSpace.has(userId)) return;
 
+                const message = await addRoomMessage(
+                    roomId,
+                    userId,
+                    name,
+                    avatarId,
+                    text,
+                    spaceId
+                );
+
                 usersInSpace.forEach(uid => {
                     const socket = room.sockets.get(uid);
                     if (socket?.readyState === WebSocket.OPEN) {
                         socket.send(JSON.stringify({
                             type: "SPACE_CHAT",
                             payload: {
-                                userId,
-                                name,
-                                avatarId,
-                                text,
-                                spaceId,
-                                timestamp: Date.now(),
+                                ...message,
                             }
                         }));
                     }
@@ -339,7 +383,7 @@ export const handleMessage = (ws: WebSocket, rawMessage: WebSocket.RawData) => {
     }
 }
 
-export const handleDisconnect = (ws: WebSocket) => {
+export const handleDisconnect = async (ws: WebSocket) => {
     const userId = (ws as any).userId;
     const roomId = (ws as any).roomId;
     const spaceId = (ws as any).spaceId;
@@ -354,13 +398,14 @@ export const handleDisconnect = (ws: WebSocket) => {
         room.chairs.delete(user.chairId);
     }
 
-    if (spaceId) {
-        room.spaces.get(spaceId)?.delete(userId);
-    }
-
     room.users.delete(userId);
     room.sockets.delete(userId);
 
+    if (spaceId) {
+        room.spaces.get(spaceId)?.delete(userId);
+        await handleUserLeaveRoom(roomId, userId, spaceId);
+    }
+    await handleUserLeaveRoom(roomId, userId);
 
     brodCastRoom(room.sockets, {
         type: "USER_LEFT",
@@ -381,6 +426,8 @@ const brodCastRoom = (
 ) => {
     sockets.forEach((socket, key) => {
         if (excludeUserId && key === excludeUserId) return;
-        socket.send(JSON.stringify(message));
+        if (socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify(message));
+        }
     })
 }

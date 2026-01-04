@@ -61,22 +61,51 @@ export type ServerMessage =
   } | {
     type: "SPACE_CHAT";
     payload: {
+      id: string;
       spaceId: string;
       userId: string;
       text: string;
-      name : string;
-      avatarId : string;
-      timestamp : number;
+      name: string;
+      avatarId: string;
+      timestamp: number;
     };
   } | {
     type: "ROOM_CHAT";
     payload: {
+      id: string;
       spaceId: string;
       userId: string;
       text: string;
-      name : string;
-      avatarId : string;
-      timestamp : number;
+      name: string;
+      avatarId: string;
+      timestamp: number;
+    };
+  } | {
+    type: "SPACE_CHAT_HISTORY";
+    payload: {
+      history: {
+        id: string;
+        spaceId: string;
+        userId: string;
+        text: string;
+        name: string;
+        avatarId: string;
+        timestamp?: number;
+        ts?: number;
+      }[];
+    };
+  } | {
+    type: "ROOM_CHAT_HISTORY";
+    payload: {
+      history: {
+        id: string;
+        userId: string;
+        text: string;
+        name: string;
+        avatarId: string;
+        timestamp?: number;
+        ts?: number;
+      }[];
     };
   };
 

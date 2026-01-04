@@ -20,8 +20,14 @@ interface Props {
   onClose?: () => void;
 }
 
-const formatTime = (ts: number) =>
-  new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+const formatTime = (ts: number | undefined) => {
+  if (!ts) return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  try {
+    return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } catch (e) {
+    return "";
+  }
+};
 
 export default function ChatPanel({
   title,

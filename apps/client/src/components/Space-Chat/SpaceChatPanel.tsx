@@ -21,7 +21,13 @@ export default function SpaceChatPanel({
 
   if (!user) return null;
 
-  const send = space.id === MAIN_SPACE.id ? sendRoomChat : sendSpaceChat;
+  const send = (text: string) => {
+    if (space.id === MAIN_SPACE.id) {
+      sendRoomChat(text, user.id, user.name, user.avatarId || "");
+    } else {
+      sendSpaceChat(text || "");
+    }
+  };
 
   return (
     <ChatPanel
