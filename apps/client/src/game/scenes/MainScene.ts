@@ -13,6 +13,8 @@ export default class MainScene extends Phaser.Scene {
   private avatarMap: Record<string, AvatarSchema>;
   private localPlayerInfo: PlayerIdentity;
   private playerGroup!: Phaser.Physics.Arcade.Group;
+  public isReady = false;
+
 
   private localPlayer?: Player;
   private remotePlayers = new Map<string, Player>();
@@ -88,7 +90,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
-    setMainScene(this);
+
 
     const map = this.make.tilemap({ key: "map" });
 
@@ -128,21 +130,51 @@ export default class MainScene extends Phaser.Scene {
 
     new CameraController(this, map.widthInPixels, map.heightInPixels);
 
+    this.isReady = true;
+    setMainScene(this);
     flushPendingMessages();
   }
+
+
 
   update() {
     this.localPlayer?.update();
 
     if (this.localPlayer) {
-      const space = this.getSpaceAt(
-        this.localPlayer.x,
-        this.localPlayer.y
-      );
+      let space = null;
+
+      // 1. If we are already in a space, check if we are still in it (with a buffer)
+      // This prevents "flickering" when standing on the edge
+      if (this.currentSpaceId) {
+        const currentSpaceObj = this.spaces.find(s =>
+          s.properties?.find((p: any) => p.name === "roomId")?.value === this.currentSpaceId
+        );
+
+        if (currentSpaceObj) {
+          // Check logic specifically for this object with a 10px buffer
+          const inside = (
+            this.localPlayer.x >= (currentSpaceObj.x ?? 0) - 10 &&
+            this.localPlayer.x <= (currentSpaceObj.x ?? 0) + (currentSpaceObj.width ?? 0) + 10 &&
+            this.localPlayer.y >= (currentSpaceObj.y ?? 0) - 10 &&
+            this.localPlayer.y <= (currentSpaceObj.y ?? 0) + (currentSpaceObj.height ?? 0) + 10
+          );
+          if (inside) {
+            space = currentSpaceObj;
+          }
+        }
+      }
+
+      // 2. If not "sticking" to current space, look for any space (strict)
+      if (!space) {
+        space = this.getSpaceAt(
+          this.localPlayer.x,
+          this.localPlayer.y,
+        );
+      }
 
       const spaceId = space
         ? String(
-          space.properties?.find((p : any) => p.name === "roomId")?.value
+          space.properties?.find((p: any) => p.name === "roomId")?.value
         )
         : null;
 
@@ -158,7 +190,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   spawnLocalPlayer(user: any) {
-    if (this.localPlayer) return;
+    if (!this.isReady || this.localPlayer) return;
+
 
     this.localPlayer = new Player(
       this,
@@ -174,7 +207,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   addRemotePlayer(user: any) {
-    if (this.remotePlayers.has(user.userId)) return;
+    if (!this.isReady || this.remotePlayers.has(user.userId)) return;
+
 
     const p = new Player(
       this,
@@ -208,9 +242,14 @@ export default class MainScene extends Phaser.Scene {
   }
 
   removeRemotePlayer(userId: string) {
-    this.remotePlayers.get(userId)?.destroy();
-    this.remotePlayers.delete(userId);
+    const player = this.remotePlayers.get(userId);
+    if (player) {
+      this.tweens.killTweensOf(player);
+      player.destroy();
+      this.remotePlayers.delete(userId);
+    }
   }
+
 
   getNearbyChair(player: Player) {
     const px = player.x;
@@ -267,13 +306,22 @@ export default class MainScene extends Phaser.Scene {
         return false;
       }
 
-      return (
+      const inside = (
         x >= space.x &&
         x <= space.x + space.width &&
         y >= space.y &&
         y <= space.y + space.height
       );
+
+      // Debug boundary check for break-room (usually around specific coords)
+      // if (space.properties?.find((p:any) => p.name === "roomId")?.value === "break-room") {
+      //   console.log(`[Phaser] Checking Break Room: Player(${Math.round(x)},${Math.round(y)}) vs Rect(${space.x},${space.y},${space.width},${space.height}) => ${inside}`);
+      // }
+
+      return inside;
+
     });
+
   }
 
   onSpaceChanged(space?: Phaser.Types.Tilemaps.TiledObject) {
@@ -282,6 +330,7 @@ export default class MainScene extends Phaser.Scene {
       setCurrentSpace(null);
       return;
     }
+
 
     const spaceId = String(
       space.properties?.find((p: any) => p.name === "roomId")?.value
@@ -292,7 +341,9 @@ export default class MainScene extends Phaser.Scene {
 
     sendJoinSpace(spaceId);
     setCurrentSpace({ id: spaceId, name });
+
   }
+
 
 
   // 🔥 IMPORTANT FIX: animations PER avatar

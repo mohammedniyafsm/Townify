@@ -6,16 +6,16 @@ import Footer from "@/components/Dashboard/Footer";
 import LandingNav from "@/components/Landing-page/LandingNav";
 
 export default function Profile() {
- 
+
   const user = useSelector((state: RootState) => state.user);
-  
+
 
   return (
     <>
-    <LandingNav />
-    <div className="relative min-h-screen pt-40"> {/* Add min-h-screen here */}
-    {/* Gradient background - make it cover entire screen */}
-      <div
+      <LandingNav />
+      <div className="relative min-h-screen pt-40"> {/* Add min-h-screen here */}
+        {/* Gradient background - make it cover entire screen */}
+        <div
           className="absolute inset-0 z-0"
           style={{
             backgroundImage: `
@@ -31,11 +31,11 @@ export default function Profile() {
       `,
           }}
         />
-    {
-        user.status === 'loading' ? <ProfileShimmer /> : <ProfileCard />
-    }
-    <Footer />
-    </div>
+        {
+          user.status === 'loading' ? <ProfileShimmer /> : <ProfileCard />
+        }
+        <Footer />
+      </div>
     </>
   );
 }

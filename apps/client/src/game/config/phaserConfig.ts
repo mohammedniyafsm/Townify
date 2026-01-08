@@ -14,6 +14,7 @@ export default function createConfig(
     height: window.innerHeight,
     parent: "game-container",
     pixelArt: true,
+    audio: { noAudio: true },
     physics: {
       default: "arcade",
       arcade: { debug: true },

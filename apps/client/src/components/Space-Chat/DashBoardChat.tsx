@@ -23,7 +23,7 @@ export default function DashBoardChat({
   }
 
   return (
-    <div className="absolute right-0 top-5 z-20 h-[700px] w-96 bg-[#202540] text-white flex flex-col rounded-xl shadow-2xl border border-white/10 overflow-hidden">
+    <div className="absolute right-0 top-2 z-20 h-[97vh]  w-96 bg-[#202540] text-white flex flex-col rounded-xl shadow-2xl border border-white/10 overflow-hidden">
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-4 border-b border-white/10 bg-[#1b1f3b]">
