@@ -7,6 +7,7 @@ import {
     handleUserJoinRoom,
     handleUserLeaveRoom,
 } from "@repo/cache"
+import { cleanUpUser, userMoved } from "./helpers.js";
 
 
 export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData) => {
@@ -14,8 +15,10 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
 
         const { type, payload } = JSON.parse(rawMessage.toString()) as MessageI;
         if (!type || typeof type !== "string") return;
-        if (!payload || typeof payload !== "object") return;
-        const { userId, name, roomId, x, y, avatarId, isSitting, chairId, facing } = payload;
+
+        // Ensure payload is an object even if missing
+        const safePayload = (payload && typeof payload === "object") ? payload : {};
+        const { userId, name, roomId, x, y, avatarId, isSitting, chairId, facing } = safePayload;
 
         switch (type) {
             case "JOIN_ROOM": {
@@ -40,9 +43,11 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                     avatarId,
                     x: 522,
                     y: 655,
+                    neighbours: new Set(),
                     isSitting: false,
                     chairId: null,
-                    facing: null
+                    facing: null,
+                    spaceId: null
                 });
 
                 (ws as any).userId = userId;
@@ -61,16 +66,15 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                     payload: Array.from(room.users.values())
                 }))
 
-                ws.send(
-                    JSON.stringify({
-                        type: "ROOM_CHAT_HISTORY",
-                        payload: {
-                            history,
-                        },
-                    })
-                );
-
-                brodCastRoom(room.sockets, {
+                const user = room.users.get(userId);
+                if (!user) return;
+                const spaceId = (ws as any).spaceId
+                if (spaceId) {
+                    cleanUpUser(room, userId);
+                } else {
+                    userMoved(room, user, userId);
+                }
+                broadcastRoom(room.sockets, {
                     type: "USER_JOINED",
                     payload: {
                         userId,
@@ -99,7 +103,13 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                 user.x = x;
                 user.y = y;
 
-                brodCastRoom(room.sockets, {
+                const spaceId = (ws as any).spaceId
+                if (spaceId) {
+                    cleanUpUser(room, userId);
+                } else {
+                    userMoved(room, user, userId);
+                }
+                broadcastRoom(room.sockets, {
                     type: "USER_MOVED",
                     payload: { userId, name, x, y }
                 }, userId)
@@ -115,19 +125,22 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                 const room = rooms.get(roomId);
                 if (!room) return;
 
+                // 🔥 Fix: Clean up proximity BEFORE deleting from users map
+                cleanUpUser(room, userId);
+
                 if (spaceId) {
                     room.spaces.get(spaceId)?.delete(userId);
                 }
                 (ws as any).spaceId = null;
                 room.users.delete(userId);
                 room.sockets.delete(userId);
-
+                delete (ws as any).spaceId;
                 delete (ws as any).userId;
                 delete (ws as any).roomId;
 
                 await handleUserLeaveRoom(roomId, userId);
 
-                brodCastRoom(room.sockets, {
+                broadcastRoom(room.sockets, {
                     type: "USER_LEFT",
                     payload: {
                         userId: userId,
@@ -139,6 +152,7 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                 }
                 break;
             }
+
 
             case "SIT": {
                 const userId = (ws as any).userId;
@@ -168,7 +182,7 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                 user.chairId = chairId;
                 user.facing = facing;
 
-                brodCastRoom(
+                broadcastRoom(
                     room.sockets,
                     {
                         type: "USER_SIT",
@@ -200,7 +214,7 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                 user.chairId = null;
                 user.facing = null;
 
-                brodCastRoom(
+                broadcastRoom(
                     room.sockets,
                     {
                         type: "USER_STAND",
@@ -224,7 +238,19 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                 if (!room) return;
 
                 const prevSpaceId = (ws as any).spaceId;
+                if (prevSpaceId === spaceId) return; // Already in this space
+
                 if (prevSpaceId) {
+                    // Notify users in previous space that this user left
+                    const prevSpaceUsers = room.spaces.get(prevSpaceId);
+                    prevSpaceUsers?.forEach((uid) => {
+                        const socket = room.sockets.get(uid);
+                        socket?.send(JSON.stringify({
+                            type: "USER_LEFT_SPACE",
+                            payload: { userId, name, spaceId: prevSpaceId }
+                        }));
+                    });
+
                     room.spaces.get(prevSpaceId)?.delete(userId);
                 }
 
@@ -234,6 +260,11 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
 
                 room.spaces.get(spaceId)!.add(userId);
                 (ws as any).spaceId = spaceId;
+                const user = room.users.get(userId);
+                if (user) user.spaceId = spaceId;
+
+                // Stop proximity-based video for this user
+                cleanUpUser(room, userId);
 
                 const usersInSpace = room.spaces.get(spaceId);
 
@@ -252,15 +283,26 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
 
                 usersInSpace?.forEach((uid) => {
                     const socket = room.sockets.get(uid);
+
+                    // 1. Tell everyone in the space (including the new user) that the new user joined
                     socket?.send(JSON.stringify({
                         type: "USER_JOINED_SPACE",
-                        payload: {
-                            userId,
-                            name,
-                            spaceId,
-                        }
+                        payload: { userId, name, spaceId }
                     }));
-                })
+
+                    // 2. Tell the NEW user about EVERYONE ELSE already in the space
+                    if (uid !== userId) {
+                        const existingUser = room.users.get(uid);
+                        ws.send(JSON.stringify({
+                            type: "USER_JOINED_SPACE",
+                            payload: {
+                                userId: uid,
+                                name: existingUser?.name,
+                                spaceId
+                            }
+                        }));
+                    }
+                });
 
                 break;
             }
@@ -271,7 +313,7 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                 const name = (ws as any).name;
                 const spaceId = (ws as any).spaceId;
 
-                if (!userId || !roomId) return;
+                if (!userId || !roomId || !spaceId) return;
 
                 const room = rooms.get(roomId);
                 if (!room) return;
@@ -280,21 +322,23 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
 
                 await handleUserLeaveRoom(roomId, userId, spaceId);
 
+                // Notify everyone in the space (including the leaver) that the user is leaving
                 usersInSpace?.forEach((uid) => {
                     const socket = room.sockets.get(uid);
                     socket?.send(JSON.stringify({
-                        type: "USER_LEAVED_SPACE",
-                        payload: {
-                            userId,
-                            name,
-                            spaceId,
-                        }
-                    }))
+                        type: "USER_LEFT_SPACE",
+                        payload: { userId, name, spaceId }
+                    }));
                 });
 
-                if (spaceId) {
-                    room.spaces.get(spaceId)?.delete(userId);
-                    (ws as any).spaceId = null;
+                // Update state
+                room.spaces.get(spaceId)?.delete(userId);
+                (ws as any).spaceId = null;
+                const user = room.users.get(userId);
+                if (user) {
+                    user.spaceId = null;
+                    // Re-calculate proximity now that they are in the "global" area
+                    userMoved(room, user, userId);
                 }
 
                 break;
@@ -323,7 +367,7 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                     text
                 );
 
-                brodCastRoom(room.sockets, {
+                broadcastRoom(room.sockets, {
                     type: "ROOM_CHAT",
                     payload: {
                         ...message,
@@ -331,21 +375,19 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
                 });
                 break;
             }
-
             case "SPACE_CHAT": {
                 const userId = (ws as any).userId;
                 const roomId = (ws as any).roomId;
                 const spaceId = (ws as any).spaceId;
                 const name = (ws as any).name;
                 const avatarId = (ws as any).avatarId;
+
                 const { text } = payload;
 
                 if (!userId || !roomId || !spaceId || !text) return;
 
                 const room = rooms.get(roomId);
                 if (!room) return;
-
-                if (!room.users.has(userId)) return;
 
                 const usersInSpace = room.spaces.get(spaceId);
                 if (!usersInSpace) return;
@@ -363,16 +405,21 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
 
                 usersInSpace.forEach(uid => {
                     const socket = room.sockets.get(uid);
-                    if (socket?.readyState === WebSocket.OPEN) {
-                        socket.send(JSON.stringify({
+                    if (socket && socket.readyState === WebSocket.OPEN) {
+                        socket?.send(JSON.stringify({
                             type: "SPACE_CHAT",
                             payload: {
                                 ...message,
+                                userId,
+                                text,
+                                spaceId,
+                                name,
+                                timestamp: Date.now(),
+                                avatarId,
                             }
                         }));
                     }
                 });
-
                 break;
             }
 
@@ -394,6 +441,10 @@ export const handleDisconnect = async (ws: WebSocket) => {
     if (!room) return;
 
     const user = room.users.get(userId);
+
+    // 🔥 Fix: Clean up proximity BEFORE deleting from users map
+    cleanUpUser(room, userId);
+
     if (user?.chairId != null) {
         room.chairs.delete(user.chairId);
     }
@@ -407,7 +458,7 @@ export const handleDisconnect = async (ws: WebSocket) => {
     }
     await handleUserLeaveRoom(roomId, userId);
 
-    brodCastRoom(room.sockets, {
+    broadcastRoom(room.sockets, {
         type: "USER_LEFT",
         payload: {
             userId: userId
@@ -419,7 +470,8 @@ export const handleDisconnect = async (ws: WebSocket) => {
     }
 }
 
-const brodCastRoom = (
+
+const broadcastRoom = (
     sockets: Map<string, WebSocket>,
     message: BroadcastMessage,
     excludeUserId?: string

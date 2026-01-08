@@ -194,3 +194,16 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.animate-shimmer {
+    animation: shimmer 2s infinite;
+}

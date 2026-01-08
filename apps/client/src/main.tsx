@@ -5,9 +5,14 @@ import { Toaster } from "@/components/ui/sonner"
 import { Provider } from 'react-redux'
 import store from './Redux/stroe.ts'
 
+import { LiveKitProvider } from './contexts/LiveKitContext.tsx'
+
 createRoot(document.getElementById('root')!).render(
      <Provider store={store}>
-    <Toaster />
-    <App />
+      <LiveKitProvider>
+        <Toaster />
+        <App />
+      </LiveKitProvider>
     </Provider>
 )
+

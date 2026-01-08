@@ -5,6 +5,7 @@ import  MapSlice from "./Slice/Maps/MapSlice";
 import UsersSlice from "./Slice/AdminUsers/UsersSlice";
 import spaceSlice from "./Slice/Space/SpaceSlice";
 import userSpaceSlice from "./Slice/UserSpace/UserSpaceSlice";
+import visibilitySlice from "./Slice/Visibility/visibilitySlice";
 
 
 const store=configureStore({
@@ -15,8 +16,10 @@ const store=configureStore({
         users:UsersSlice,
         spaces:spaceSlice,
         userSpace:userSpaceSlice,
+        visibility: visibilitySlice,
     }
 })
+
 
 export default store
 

@@ -160,9 +160,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       const y = Math.round(this.y);
 
       if (
-        Math.abs(x - this.lastSent.x) > 2 ||
-        Math.abs(y - this.lastSent.y) > 2
+        Math.abs(x - this.lastSent.x) >= 1 ||
+        Math.abs(y - this.lastSent.y) >= 1
       ) {
+
         sendMove(x, y);
         this.lastSent = { x, y };
       }
@@ -264,11 +265,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   stopRemote() {
-    if (this.isSitting) return;
+    if (!this.active || !this.anims || this.isSitting) return;
 
-    this.stop();
-    this.setFrame(Player.IDLE_FRAMES[this.lastDirection]);
+    try {
+      this.stop();
+      this.setFrame(Player.IDLE_FRAMES[this.lastDirection]);
+    } catch (e) {
+      // Phaser sometimes throws if anims are mid-destruction
+    }
   }
+
 
   /* ---------------- HELPERS ---------------- */
 

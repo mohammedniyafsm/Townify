@@ -6,3 +6,8 @@ catalogs:
   prisma:
     '@prisma/client': ^7.1.0
     prisma: latest
+
+ignoredBuiltDependencies:
+  - '@prisma/engines'
+  - '@scarf/scarf'
+  - prisma

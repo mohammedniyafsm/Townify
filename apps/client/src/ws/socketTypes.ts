@@ -107,7 +107,33 @@ export type ServerMessage =
         ts?: number;
       }[];
     };
+  } | {
+    type: "USER_NEARBY_ENTER";
+    payload: {
+      userId: string;
+      targetUserId: string;
+    };
+  } | {
+    type: "USER_NEARBY_LEAVE";
+    payload: {
+      targetUserId: string;
+    };
+  } | {
+    type: "USER_JOINED_SPACE";
+    payload: {
+      userId: string;
+      name: string;
+      spaceId: string;
+    };
+  } | {
+    type: "USER_LEFT_SPACE";
+    payload: {
+      userId: string;
+      name: string;
+      spaceId: string;
+    };
   };
+
 
 
 export type SitMessage = {

@@ -44,6 +44,10 @@ app.use('/map', mapRoute);
 app.use('/avatar', avatarRoute);
 app.use('/admin',adminRoute);
 
+import LiveKitRouter from "./modules/livekit/livekit.routes.js";
+app.use('/api/livekit', LiveKitRouter);
+
+
 
 app.listen(8080,() => {
     console.log("Server Listining at 8080")
