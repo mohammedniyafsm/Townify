@@ -300,6 +300,7 @@ export const requestAccessService = async (
         email: user.email,
         userId,
         spaceId : space.id,
+        slug : space.slug,
         status : 'pending',
         type : 'link',
         userName: user.name,

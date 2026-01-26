@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { approveRequestAccess } from "@/api/SpaceApi";
 
@@ -6,47 +7,77 @@ type JoinRequest = {
     userName: string;
     email: string;
     inviteId: string;
+    slug: string;
 };
 
 const AUTO_DISMISS_MS = 12_000;
 
 export default function JoinRequestToast() {
+    const location = useLocation();
+    const currentSlug = location.pathname.split("/").pop();
+
+
     const [requests, setRequests] = useState<JoinRequest[]>([]);
     const [loadingId, setLoadingId] = useState<string | null>(null);
 
     const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
     useEffect(() => {
-        const handler = (e: CustomEvent<JoinRequest>) => {
-            const req = e.detail;
+        const handler = (e: any) => {
+            console.log("JOIN REQUEST EVENT:", e.detail);
 
-            // ✅ Prevent duplicate toasts
+            // ✅ Support BOTH payload formats:
+            // event.detail.payload OR event.detail directly
+            const payload = e.detail?.payload ?? e.detail;
+
+            if (!payload) {
+                console.warn("JOIN REQUEST IGNORED — NO PAYLOAD");
+                return;
+            }
+
+            console.log("CURRENT SPACE SLUG:", currentSlug);
+            console.log("REQUEST SPACE SLUG:", payload.slug);
+
+            // ✅ If inside a space → block other space requests
+            if (currentSlug && payload.slug !== currentSlug) {
+                console.warn("BLOCKED — WRONG SPACE REQUEST");
+                return;
+            }
+
+            const req: JoinRequest = {
+                userName: payload.userName,
+                email: payload.email,
+                inviteId: payload.inviteId,
+                slug: payload.slug,
+            };
+
+            // ✅ Prevent duplicate notifications
             setRequests(prev =>
                 prev.some(r => r.inviteId === req.inviteId)
                     ? prev
                     : [...prev, req]
             );
 
+            // ✅ Auto dismiss timer
             timers.current[req.inviteId] = setTimeout(() => {
                 remove(req.inviteId);
             }, AUTO_DISMISS_MS);
         };
 
-        window.addEventListener(
-            "JOIN_REQUEST_RECEIVED",
-            handler as EventListener
-        );
+        window.addEventListener("JOIN_REQUEST_RECEIVED", handler);
 
         return () => {
-            window.removeEventListener(
-                "JOIN_REQUEST_RECEIVED",
-                handler as EventListener
-            );
-
-            // ✅ Clear all timers on unmount
+            window.removeEventListener("JOIN_REQUEST_RECEIVED", handler);
             Object.values(timers.current).forEach(clearTimeout);
         };
-    }, []);
+    }, [currentSlug]);
+
+    // ✅ Clear notifications when switching spaces
+    useEffect(() => {
+        setRequests([]);
+        Object.values(timers.current).forEach(clearTimeout);
+        timers.current = {};
+    }, [currentSlug]);
 
     const remove = (inviteId: string) => {
         const timer = timers.current[inviteId];
@@ -71,7 +102,7 @@ export default function JoinRequestToast() {
     if (requests.length === 0) return null;
 
     return (
-        <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+        <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-2">
             {requests.map(req => (
                 <div
                     key={req.inviteId}
@@ -122,7 +153,6 @@ export default function JoinRequestToast() {
 
                             {/* actions */}
                             <div className="mt-2 flex gap-4">
-                                {/* Decline (local only) */}
                                 <button
                                     className="text-xs text-neutral-400 hover:text-red-400 transition"
                                     onClick={() => remove(req.inviteId)}
@@ -131,7 +161,6 @@ export default function JoinRequestToast() {
                                     Decline
                                 </button>
 
-                                {/* Accept */}
                                 <button
                                     className={cn(
                                         "text-xs transition",
