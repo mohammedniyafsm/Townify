@@ -30,6 +30,7 @@ import Profile from "./pages/Profile";
 import DashBoardChat from "./components/Space-Chat/DashBoardChat";
 import { useNotificationSocket } from "./hooks/useNotificationSocket";
 import JoinApprovalToast from "./components/Notification/User/JoinApprovalToast";
+import JoinRequestToast from "./components/Notification/Admin/JoinRequestToast";
 
 
 function App() {
@@ -69,6 +70,7 @@ function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
       <BrowserRouter>
+        <JoinRequestToast />
         <JoinApprovalToast />
         <Routes>
           <Route path="/" element={<Home />} />

@@ -53,7 +53,6 @@ export interface MapSchemaI {
   name: string;
   thumbnail: string;
   thumbnailId: string;
-  // kept as `any` to match flexible JSON usage across the client codebase
   configJson: any;
 
   spaces?: SpaceI[];
