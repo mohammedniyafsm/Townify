@@ -1,7 +1,7 @@
 import type WebSocket from "ws";
 import type { RoomI, UserI } from "./types.js";
 
-const PROXIMITY_RADIUS = 120;
+const PROXIMITY_RADIUS = 80;
 
 
 

@@ -31,7 +31,7 @@ function DashContent({
 
   const filteredSpaces = userMap?.spaces?.filter((space) => {
     if (!searchQuery.trim()) return true;
-    
+
     const query = searchQuery.toLowerCase();
     return (
       space?.name?.toLowerCase().includes(query) ||
@@ -41,7 +41,7 @@ function DashContent({
   }) || [];
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;    
+    const value = e.target.value;
     startTransition(() => {
       setSearchQuery(value);
     });
@@ -93,8 +93,8 @@ function DashContent({
       console.log(error);
       toast.error(
         error.response?.data?.message ||
-          error.message ||
-          "Failed to delete space"
+        error.message ||
+        "Failed to delete space"
       );
     } finally {
       setDeletingId(null);
@@ -149,7 +149,7 @@ function DashContent({
 
       {/* Spaces Grid */}
       <div className="flex flex-wrap gap-10 items-center py-5">
-        {userMap?.status === "loading" || userMap?.status === "idle"||isPending ? (
+        {userMap?.status === "loading" || userMap?.status === "idle" || isPending ? (
           // Loading shimmer
           <div className="flex flex-wrap gap-6">
             {[...Array(3)].map((_, index) => (
@@ -162,13 +162,13 @@ function DashContent({
             <div key={map?.id} className="">
               <div>
                 <img
-                  onClick={() => navigate(`/space/manage/${map?.slug}`)}
+                  onClick={() => navigate(`/lobby/${map?.slug}`)}
                   className="rounded-2xl h-72 w-90 cursor-pointer hover:opacity-90 transition-opacity"
                   src={map?.map?.thumbnail}
                   alt={map?.name || "Space thumbnail"}
                 />
               </div>
-              
+
               <div className="flex flex-col px-1 py-2 ">
                 <div className="flex justify-between items-center relative">
                   <h1 className="font-bricogrotesque text-base font-bold truncate max-w-[200px]">
@@ -176,48 +176,48 @@ function DashContent({
                   </h1>
                   <div className="flex gap-2 items-center ">
                     <h1 className="text-xs text-gray-500">2 days ago</h1>
-                    <MoreVertical 
-                      onClick={() => setActiveMenuId(activeMenuId === map?.id ? null : map?.id)} 
-                      className="w-5  h-5 cursor-pointer hover:bg-amber-50 rounded-lg p-0.5 transition-colors" 
+                    <MoreVertical
+                      onClick={() => setActiveMenuId(activeMenuId === map?.id ? null : map?.id)}
+                      className="w-5  h-5 cursor-pointer hover:bg-amber-50 rounded-lg p-0.5 transition-colors"
                     />
                   </div>
-                  
-                {activeMenuId === map?.id && (
-                  <div ref={menuRef} className="absolute right-0 top-7 z-10">
-                    <div className="flex flex-col text-sm font-medium bg-background py-2 rounded-lg shadow-lg border border-gray-200 min-w-[130px]">
-                      <button
-                        onClick={() => handlecopy(map?.slug)}
-                        className='hover:bg-[#f2f7fc] px-4 py-2 cursor-pointer flex justify-between gap-2 items-center  font-bricogrotesque transition-colors'
-                      >
-                        Copy URL {copy ? <Check className='h-4 w-3' /> : <Link className='h-4 w-3' />}
-                      </button>
-                      <button
-                        onClick={() => navigate(`/lobby/${map?.slug}`)}
-                        className='hover:bg-[#f2f7fc] px-4 py-2 cursor-pointer flex justify-between items-center gap-2 font-bricogrotesque transition-colors'
-                      >
-                        Join Space 
-                      </button>
-                      <button
-                        onClick={() => deleteMap(map?.id)}
-                        disabled={deletingId === map?.id}
-                        className='hover:bg-[#f2f7fc] font-bricogrotesque px-4 py-2 cursor-pointer flex justify-between gap-2 items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-                      >
-                        {deletingId === map?.id ? (
-                          <>
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
-                            Deleting...
-                          </>
-                        ) : (
-                          <>
-                            Delete Space <Trash className='h-4 w-3' />
-                          </>
-                        )}
-                      </button>
+
+                  {activeMenuId === map?.id && (
+                    <div ref={menuRef} className="absolute right-0 top-7 z-10">
+                      <div className="flex flex-col text-sm font-medium bg-background py-2 rounded-lg shadow-lg border border-gray-200 min-w-[130px]">
+                        <button
+                          onClick={() => handlecopy(map?.slug)}
+                          className='hover:bg-[#f2f7fc] px-4 py-2 cursor-pointer flex justify-between gap-2 items-center  font-bricogrotesque transition-colors'
+                        >
+                          Copy URL {copy ? <Check className='h-4 w-3' /> : <Link className='h-4 w-3' />}
+                        </button>
+                        <button
+                          onClick={() => navigate(`/space/manage/${map?.slug}`)}
+                          className='hover:bg-[#f2f7fc] px-4 py-2 cursor-pointer flex justify-between items-center gap-2 font-bricogrotesque transition-colors'
+                        >
+                          Manage Space
+                        </button>
+                        <button
+                          onClick={() => deleteMap(map?.id)}
+                          disabled={deletingId === map?.id}
+                          className='hover:bg-[#f2f7fc] font-bricogrotesque px-4 py-2 cursor-pointer flex justify-between gap-2 items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                        >
+                          {deletingId === map?.id ? (
+                            <>
+                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
+                              Deleting...
+                            </>
+                          ) : (
+                            <>
+                              Delete Space <Trash className='h-4 w-3' />
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
                 </div>
-                
+
 
 
               </div>

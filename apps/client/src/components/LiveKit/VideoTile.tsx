@@ -17,7 +17,7 @@ function VideoTile({ participant, mode, isFocused = false, onEnterExpandedGrid }
     const getSizeClass = () => {
         switch (mode) {
             case 'collapsed':
-                return 'w-[180px] sm:w-[200px] md:w-[220px]';
+                return 'w-full h-full';
             case 'expanded-grid':
                 return 'w-full';
             case 'expanded-focus':
@@ -37,7 +37,7 @@ function VideoTile({ participant, mode, isFocused = false, onEnterExpandedGrid }
             : "border border-gray-700/30 hover:border-gray-500/50";
         const hover = mode === 'collapsed' ? "hover:scale-[1.02] hover:shadow-xl" : "";
 
-        return `${size} ${base} ${border} ${hover}`;
+        return `${size} ${base} ${border} ${hover} p-0`;
     };
 
     return (
@@ -78,34 +78,33 @@ function VideoTile({ participant, mode, isFocused = false, onEnterExpandedGrid }
                             {participant.audioTrack && <AudioComponent track={participant.audioTrack} />}
                         </div>
                     )}
+                </div>
 
-                    {/* Participant Info Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <span className={`font-medium text-white truncate ${mode === 'collapsed' ? 'text-sm' :
-                                    mode === 'expanded-focus-bottom' ? 'text-xs' : 'text-base'
-                                    }`}>
-                                    {participant.name}
-                                </span>
-                                {participant.isLocal && (
-                                    <Badge variant="secondary" className="px-1.5 py-0.5 text-xs">
-                                        You
-                                    </Badge>
-                                )}
-                            </div>
-                            <div className="flex items-center gap-1">
-                                {participant.videoTrack && (
-                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" title="Video active" />
-                                )}
-                                {participant.audioTrack && (
-                                    <div className="w-2 h-2 rounded-full bg-green-500" title="Audio active" />
-                                )}
-                            </div>
-                        </div>
+            </CardContent>
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent px-4 pb-2">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <span className={`font-medium text-white truncate ${mode === 'collapsed' ? 'text-sm' :
+                            mode === 'expanded-focus-bottom' ? 'text-xs' : 'text-base'
+                            }`}>
+                            {participant.name}
+                        </span>
+                        {participant.isLocal && (
+                            <Badge variant="secondary" className="px-1.5 py-0.5 text-xs">
+                                You
+                            </Badge>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        {participant.videoTrack && (
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" title="Video active" />
+                        )}
+                        {participant.audioTrack && (
+                            <div className="w-2 h-2 rounded-full bg-green-500" title="Audio active" />
+                        )}
                     </div>
                 </div>
-            </CardContent>
+            </div>
         </Card>
     );
 }

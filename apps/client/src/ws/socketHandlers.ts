@@ -19,6 +19,8 @@ let pending: ServerMessage[] = [];
 // Redux handles visibility now, so we don't need these manual callbacks
 // but we keep the logic within the store dispatching
 
+
+
 export const handleSocketMessage = (message: ServerMessage) => {
   const scene = getMainScene();
 
@@ -39,7 +41,7 @@ export const flushPendingMessages = () => {
 };
 
 function process(scene: any, message: ServerMessage) {
-  console.log("WS Received:", message.type, message);
+
   switch (message.type) {
     case "ROOM_STATE":
       message.payload.forEach((u: any) => {
@@ -54,11 +56,13 @@ function process(scene: any, message: ServerMessage) {
       break;
 
     case "USER_NEARBY_ENTER":
+      console.log("USER_NEARBY_ENTER", message.payload);
       const enterId = (message.payload as any).targetUserId || (message.payload as any).userId;
       if (enterId) store.dispatch(addNearbyUser(enterId));
       break;
 
     case "USER_NEARBY_LEAVE":
+      console.log("USER_NEARBY_LEAVE", message.payload);
       const leaveId = (message.payload as any).targetUserId || (message.payload as any).userId;
       if (leaveId) store.dispatch(removeNearbyUser(leaveId));
 
@@ -69,6 +73,7 @@ function process(scene: any, message: ServerMessage) {
       const joinUserId = message.payload.userId;
       const joinSpaceId = message.payload.spaceId;
       const currentUserId = store.getState().user.user?.id;
+      console.log("USER_JOINED_SPACE", joinUserId, joinSpaceId, currentUserId);
 
       if (joinUserId === currentUserId) {
         store.dispatch(setSelfSpaceId(joinSpaceId));
@@ -81,7 +86,7 @@ function process(scene: any, message: ServerMessage) {
     case "USER_LEFT_SPACE": {
       const leftUserId = message.payload.userId;
       const myId = store.getState().user.user?.id;
-
+      console.log("USER_LEFT_SPACE", leftUserId, myId);
       if (leftUserId === myId) {
         store.dispatch(removeAllSpaceUser());
         store.dispatch(setSelfSpaceId(null));

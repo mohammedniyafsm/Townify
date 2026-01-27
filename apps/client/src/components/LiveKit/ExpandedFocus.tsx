@@ -1,9 +1,6 @@
-import { Focus } from "lucide-react";
+import { Focus, Grid3x3, Minimize2 } from "lucide-react";
 import { Button } from "../ui/button";
-import { Grid3x3 } from "lucide-react";
-import { Minimize2 } from "lucide-react";
 import VideoTile from "./VideoTile";
-import { useMemo } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 
 interface ExpandedFocusViewProps {
@@ -25,153 +22,87 @@ function ExpandedFocusView({
 }: ExpandedFocusViewProps) {
     const unfocusedParticipants = participants.filter(p => p.id !== focusedParticipantId);
 
-    // Split unfocused participants into right column and bottom section
-    const [rightColumnParticipants, bottomParticipants] = useMemo(() => {
-        const maxRightColumn = Math.max(3, Math.floor(window.innerHeight / 200));
-        return [
-            unfocusedParticipants.slice(0, maxRightColumn),
-            unfocusedParticipants.slice(maxRightColumn)
-        ];
-    }, [unfocusedParticipants]);
-
     return (
-        <div className="fixed inset-0 z-40 bg-black/90 backdrop-blur-sm">
-            {/* Header Controls */}
-            <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+        <div className="fixed inset-0 z-40 bg-gradient-to-br from-gray-950 via-gray-900 to-black">
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 bg-grid-white/[0.02] bg-grid opacity-60" />
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-500/5 via-transparent to-purple-500/5" />
+
+            {/* Header Controls - Modern floating */}
+            <div className="absolute top-6 right-6 z-50 flex items-center gap-3">
                 <Button
                     size="sm"
                     variant="ghost"
                     onClick={onExitFocus}
-                    className="bg-gray-800/80 hover:bg-gray-700/80 backdrop-blur-sm text-gray-300 hover:text-white"
+                    className="group bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 text-white/90 hover:text-white transition-all duration-300 rounded-xl px-4 py-6 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/10"
                     title="Return to grid (Esc)"
                 >
-                    <Grid3x3 className="w-4 h-4 mr-2" />
+                    <Grid3x3 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                     Grid View
                 </Button>
                 <Button
                     size="icon"
                     variant="ghost"
                     onClick={onExitExpanded}
-                    className="bg-gray-800/80 hover:bg-gray-700/80 backdrop-blur-sm text-gray-300 hover:text-white"
+                    className="group bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all duration-300 rounded-xl w-12 h-12 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/10"
                     title="Collapse (Esc)"
                 >
-                    <Minimize2 className="w-4 h-4" />
+                    <Minimize2 className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" />
                 </Button>
             </div>
 
             {/* Content Layout */}
-            <div className="h-full pt-16 pb-4 px-4 md:px-6 lg:px-8">
-                <div className="h-full flex flex-col md:flex-row gap-4 md:gap-6">
-                    {/* Left: Focused Video */}
-                    <div className="flex-1 flex flex-col">
-                        <div className="flex-1 relative rounded-2xl overflow-hidden bg-gray-900/50 border border-gray-700/30">
+            <div className="h-full pt-20 pb-6 px-6 lg:px-8">
+                <div className="h-full flex flex-col lg:flex-row gap-6">
+                    {/* Main Focused Video */}
+                    <div className="flex-1 min-h-0 flex flex-col">
+                        <div className="relative group/focused flex-1 rounded-3xl overflow-hidden bg-gradient-to-br from-gray-900/80 to-gray-950/80 border-2 border-white/10 shadow-2xl shadow-blue-500/10 hover:border-white/20 transition-all duration-500">
                             <VideoTile
                                 participant={focusedParticipant}
                                 mode="expanded-focus"
                                 isFocused={true}
                             />
-                            {/* Focus Indicator */}
-                            <div className="absolute top-4 left-4 bg-gradient-to-r from-purple-600/20 to-blue-600/20 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-purple-500/30">
-                                <div className="flex items-center gap-2">
-                                    <Focus className="w-3.5 h-3.5 text-purple-300" />
-                                    <span className="text-sm text-purple-200 font-medium">Focused</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Focused Participant Info */}
-                        <div className="mt-4 flex items-center justify-between px-2">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
-                                    <span className="text-sm font-bold text-white">
-                                        {focusedParticipant.name.charAt(0).toUpperCase()}
-                                    </span>
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold text-white">
-                                        {focusedParticipant.name}
-                                    </h3>
-                                    <p className="text-gray-400 text-sm">
-                                        {focusedParticipant.isLocal ? "You" : "Participant"}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                {focusedParticipant.videoTrack && (
-                                    <div className="flex items-center gap-1.5">
-                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-sm text-gray-400">Video</span>
-                                    </div>
-                                )}
-                                {focusedParticipant.audioTrack && (
-                                    <div className="flex items-center gap-1.5">
-                                        <div className="w-2 h-2 rounded-full bg-green-500" />
-                                        <span className="text-sm text-gray-400">Audio</span>
-                                    </div>
-                                )}
-                            </div>
                         </div>
                     </div>
 
-                    {/* Right: Column of Unfocused Videos */}
-                    {rightColumnParticipants.length > 0 && (
-                        <div className="md:w-72 lg:w-80 flex flex-col gap-4">
-                            {rightColumnParticipants.map((participant) => (
-                                <div key={participant.id} className="relative">
-                                    <VideoTile
-                                        participant={participant}
-                                        mode="expanded-focus-side"
-                                    />
-                                    <Button
-                                        size="icon"
-                                        variant="secondary"
-                                        onClick={() => onToggleFocus(participant.id)}
-                                        className="absolute top-2 right-2 bg-gray-900/90 hover:bg-gray-800/90 backdrop-blur-sm w-7 h-7 shadow-lg"
-                                        title="Focus on this participant"
-                                    >
-                                        <Focus className="w-3 h-3" />
-                                    </Button>
+                    {/* Sidebar / Bottom Stack for Unfocused Participants */}
+                    {unfocusedParticipants.length > 0 && (
+                        <div className="lg:w-80 xl:w-96 flex flex-col lg:h-full h-[200px] shrink-0 min-h-0">
+
+                            <ScrollArea className="flex-1 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm overflow-hidden">
+                                <div className="p-4 flex flex-col gap-3">
+                                    {unfocusedParticipants.map((participant) => (
+                                        <div
+                                            key={participant.id}
+                                            className="group/side relative rounded-xl overflow-hidden bg-gradient-to-br from-gray-900/80 to-gray-950/80 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shrink-0 aspect-video lg:aspect-video"
+                                        >
+                                            <VideoTile
+                                                participant={participant}
+                                                mode="expanded-focus-side"
+                                            />
+
+                                            {/* Overlay Controls */}
+                                            <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover/side:opacity-100 transition-opacity duration-300 flex items-center justify-end">
+
+                                                <Button
+                                                    size="icon"
+                                                    onClick={() => onToggleFocus(participant.id)}
+                                                    className="h-7 w-7 rounded-lg bg-white/10 hover:bg-white/20 text-white border cursor-pointer border-white/10 backdrop-blur-md transition-all hover:scale-105"
+                                                    title="Focus View"
+                                                >
+                                                    <Focus className="w-3.5 h-3.5" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            </ScrollArea>
                         </div>
                     )}
                 </div>
-
-                {/* Bottom: Remaining Unfocused Videos */}
-                {bottomParticipants.length > 0 && (
-                    <div className="mt-6">
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="h-px flex-1 bg-gray-700/50" />
-                            <span className="text-sm text-gray-500 px-3">Other Participants</span>
-                            <div className="h-px flex-1 bg-gray-700/50" />
-                        </div>
-                        <ScrollArea className="h-40">
-                            <div className="flex gap-3 pb-4">
-                                {bottomParticipants.map((participant) => (
-                                    <div key={participant.id} className="relative flex-shrink-0">
-                                        <VideoTile
-                                            participant={participant}
-                                            mode="expanded-focus-bottom"
-                                        />
-                                        <Button
-                                            size="icon"
-                                            variant="secondary"
-                                            onClick={() => onToggleFocus(participant.id)}
-                                            className="absolute top-2 right-2 bg-gray-900/90 hover:bg-gray-800/90 backdrop-blur-sm w-6 h-6 shadow-lg"
-                                            title="Focus on this participant"
-                                        >
-                                            <Focus className="w-2.5 h-2.5" />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </ScrollArea>
-                    </div>
-                )}
             </div>
         </div>
     );
 }
-
 
 export default ExpandedFocusView;

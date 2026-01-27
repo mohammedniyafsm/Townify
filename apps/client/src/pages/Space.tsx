@@ -128,7 +128,7 @@ export default function Space() {
   useEffect(() => {
     if (state !== "allowed" || !slug) return;
 
-    const targetRoom = selfSpaceId ? `${slug}/${selfSpaceId}` : slug;
+    const targetRoom = slug;
 
     if (currentRoomName === targetRoom) return;
 
@@ -142,20 +142,16 @@ export default function Space() {
     };
 
     handleConnect();
-  }, [slug, selfSpaceId, state, currentRoomName]);
+  }, [slug, state, currentRoomName]);
 
   // Compute Visible Participants
   const visibleParticipants = useMemo(() => {
-    console.log("selfSpaceId", selfSpaceId);
-    console.log("participants", participants);
-    console.log("nearbyUserIds", nearbyUserIds);
-    console.log("spaceUserIds", spaceUserIds);
     if (selfSpaceId) {
       return participants.filter(p => spaceUserIds.includes(p.identity) && p.identity !== user?.id);
     } else {
       return participants.filter(p => nearbyUserIds.includes(p.identity));
     }
-  }, [participants, selfSpaceId, nearbyUserIds]);
+  }, [participants, selfSpaceId, nearbyUserIds, spaceUserIds]);
 
 
 

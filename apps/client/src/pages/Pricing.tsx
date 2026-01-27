@@ -1,3 +1,4 @@
+import Footer from "@/components/Dashboard/Footer"
 import LandingNav from "@/components/Landing-page/LandingNav"
 import FAQ from "@/components/Pricing/FAQ"
 import PricingCont from "@/components/Pricing/PricingCont"
@@ -26,7 +27,7 @@ function Pricing() {
                     }}
                 />
                 {/* Your Content/Components */}
-                <div className="pt-40 relative">
+                <div className="pt-24 md:pt-40 relative">
 
                     <PricingCont />
                     <div className="py-10">
@@ -35,6 +36,7 @@ function Pricing() {
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
     )
 }
