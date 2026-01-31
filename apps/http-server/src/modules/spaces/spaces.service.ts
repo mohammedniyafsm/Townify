@@ -67,12 +67,12 @@ export const updateSpaceService = async (
 
   // Get all members before update to invalidate their caches
   const members = await findMembersBySpaceId(spaceId);
-  const memberUserIds = members.map(m => m.userId);
+  const memberUserIds = members.map((m : any) => m.userId);
 
   await cacheDel("spaces:list")
   // Invalidate cache for all members (space name/map changed in their cache)
   await Promise.all(
-    memberUserIds.map(uid => cacheDel(`users:me:${uid}`))
+    memberUserIds.map((uid : any) => cacheDel(`users:me:${uid}`))
   );
 
   await cacheDel(`spaces:user:${space.creatorId}`) // Creator's cached spaces updated
@@ -97,12 +97,12 @@ export const deleteSpaceService = async (
 
   // Get all members before deletion to invalidate their caches
   const members = await findMembersBySpaceId(spaceId);
-  const memberUserIds = members.map(m => m.userId);
+  const memberUserIds = members.map((m : any) => m.userId);
 
   await cacheDel("spaces:list")
   // Invalidate cache for all members (space removed from their cache)
   await Promise.all(
-    memberUserIds.map(uid => cacheDel(`users:me:${uid}`))
+    memberUserIds.map((uid : any) => cacheDel(`users:me:${uid}`))
   );
 
   await cacheDel(`spaces:user:${userId}`) // Creator's cached spaces updated
@@ -373,13 +373,13 @@ export const bulkRemoveInvitesService = async (userId: string, slug: string, inv
 
   // Get user IDs before deletion to invalidate their caches
   const userIds = await getUserIdsFromInvites(space.id, invitationIds);
-  const userIdList = userIds.map(u => u.userId).filter((id): id is string => id !== null);
+  const userIdList = userIds.map((u : any) => u.userId).filter((id): id is string => id !== null);
 
   const emails = await getApprovedInvitesByIds(space.id, invitationIds);
-  const emailList = emails.map((e) => e.email).filter((email): email is string => email !== null);
+  const emailList = emails.map((e) => e.email).filter((email : any): email is string => email !== null);
   // Invalidate cache for all removed users
   await Promise.all(
-    userIdList.map(uid => cacheDel(`users:me:${uid}`))
+    userIdList.map((uid : any) => cacheDel(`users:me:${uid}`))
   );
 
   const [invites, members] = await prisma.$transaction([
@@ -396,10 +396,10 @@ export const bulkApproveInvitesService = async (userId: string, slug: string, in
   if (!space) throw new Error("SPACE_NOT_FOUND");
   if (space.creatorId.toString() != userId) throw new Error("FORBIDDEN");
   const userIds = await getUserIdsFromInvites(space.id, invitationIds);
-  const userIdList = userIds.map((u) => u.userId).filter((id): id is string => id !== null);
-  const emailList = userIds.map((u) => u.email).filter((email): email is string => email !== null);
+  const userIdList = userIds.map((u :any) => u.userId).filter((id : any): id is string => id !== null);
+  const emailList = userIds.map((u : any) => u.email).filter((email : any): email is string => email !== null);
   const url = `${process.env.CLIENT_URL || 'http://localhost:5173'}/lobby/${space.slug}`;
-  const spaceApprovedEmail = emailList.map((email) => inviteApprovalEmail(
+  const spaceApprovedEmail = emailList.map((email : any) => inviteApprovalEmail(
 
     email,
     space.name,
@@ -407,7 +407,7 @@ export const bulkApproveInvitesService = async (userId: string, slug: string, in
   ));
   // Invalidate cache for all approved users (they joined the space)
   await Promise.all(
-    userIdList.map(uid => cacheDel(`users:me:${uid}`))
+    userIdList.map((uid : any) => cacheDel(`users:me:${uid}`))
   );
 
   const [invites, members] = await prisma.$transaction([

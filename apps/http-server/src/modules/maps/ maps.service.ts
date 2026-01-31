@@ -111,13 +111,13 @@ export const updateMapService = async (
   // Map changed - invalidate all users who created spaces with this map
   const affectedCreators = await findCreatorsByMapId(id);
   await Promise.all(
-    affectedCreators.map(creatorId => cacheDel(`spaces:user:${creatorId}`))
+    affectedCreators.map((creatorId : any) => cacheDel(`spaces:user:${creatorId}`))
   );
 
   // Invalidate all slug caches for spaces using this map
   const affectedSlugs = await findSlugsByMapId(id);
   await Promise.all(
-    affectedSlugs.map(slug => cacheDel(`spaces:slug:${slug}`))
+    affectedSlugs.map((slug : any) => cacheDel(`spaces:slug:${slug}`))
   );
 
   return updateMapRepo(id, data);
@@ -137,12 +137,12 @@ export const deleteMapService = async (id: string) => {
 
   // Invalidate all affected users' space caches
   await Promise.all(
-    affectedCreators.map(creatorId => cacheDel(`spaces:user:${creatorId}`))
+    affectedCreators.map((creatorId : any) => cacheDel(`spaces:user:${creatorId}`))
   );
 
   // Invalidate all slug caches
   await Promise.all(
-    affectedSlugs.map(slug => cacheDel(`spaces:slug:${slug}`))
+    affectedSlugs.map((slug : any) => cacheDel(`spaces:slug:${slug}`))
   );
 
   await deleteMapRepo(id);

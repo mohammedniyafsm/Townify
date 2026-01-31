@@ -324,7 +324,7 @@ export const findCreatorsByMapId = async (mapId: string) => {
     select: { creatorId: true },
     distinct: ['creatorId']
   });
-  return spaces.map(s => s.creatorId);
+  return spaces.map((s : any) => s.creatorId);
 };
 
 export const findSlugsByMapId = async (mapId: string) => {
@@ -332,5 +332,5 @@ export const findSlugsByMapId = async (mapId: string) => {
     where: { mapId },
     select: { slug: true }
   });
-  return spaces.map(s => s.slug);
+  return spaces.map((s: any) => s.slug);
 }; 
