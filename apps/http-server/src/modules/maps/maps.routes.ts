@@ -1,9 +1,3 @@
-/**
- * @swagger
- * tags:
- *   name: Maps
- *   description: Map management APIs
- */
 
 import { Router } from "express";
 import {
@@ -14,7 +8,7 @@ import {
   deleteMap,
 } from "./maps.controller.js";
 import { mapUpload } from "../../shared/services/multer.service.js";
-import { adminMiddleware, userMiddleware } from "src/shared/middleware/auth.middleware.js";
+import { adminMiddleware, userMiddleware } from "../../shared/middleware/auth.middleware.js";
 
 const router:Router = Router();
 
@@ -23,13 +17,7 @@ const mapMulter = mapUpload.fields([
   { name: "mapJson", maxCount: 1 },
 ]);
 
-/**
- * @swagger
- * /maps:
- *   post:
- *     summary: Upload a new map
- *     tags: [Maps]
- */
+
 router.post("/",adminMiddleware, mapMulter, uploadMap);
 
 router.get("/",userMiddleware, fetchMaps);

@@ -1,10 +1,3 @@
-/**
- * @swagger
- * tags:
- *   name: Avatars
- *   description: Avatar management APIs
- */
-
 import { Router } from "express";
 import {
   uploadAvatar,
@@ -14,17 +7,10 @@ import {
   deleteAvatar,
 } from "./avatars.controller.js";
 import { imageUpload } from "../../shared/services/multer.service.js";
-import { adminMiddleware } from "src/shared/middleware/auth.middleware.js";
+import { adminMiddleware } from "../../shared/middleware/auth.middleware.js";
 
 const router:Router = Router();
 
-/**
- * @swagger
- * /avatars:
- *   post:
- *     summary: Upload a new avatar
- *     tags: [Avatars]
- */
 
 const avatarUpload=()=>{
   return imageUpload.fields([

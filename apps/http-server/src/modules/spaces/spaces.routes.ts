@@ -1,10 +1,3 @@
-/**
- * @swagger
- * tags:
- *   name: Spaces
- *   description: Space management APIs
- */
-
 import { Router } from "express";
 import { userMiddleware } from "../../shared/middleware/auth.middleware.js";
 import {
@@ -27,15 +20,6 @@ import {
 } from "./spaces.controller.js";
 
 const router:Router = Router();
-
-/**
- * @swagger
- * /spaces:
- *   post:
- *     summary: Create a new space
- *     tags: [Spaces]
- */
-
 
 
 // ---------- READ / ACCESS ----------

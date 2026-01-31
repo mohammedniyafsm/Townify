@@ -1,5 +1,5 @@
 import { MemberStatus, prisma } from "@repo/database";
-import type { SpaceMembersCreateManyInput } from "@repo/database/generated/prisma/models.js";
+import type { Prisma } from "@repo/database";
 
 export const createSpaceRepo = (data: {
   name: string;
@@ -277,7 +277,7 @@ export const getUserIdsFromInvites = (spaceId: string, inviteIds: string[]) => {
 }
 
 export const bulkAddMembers = (spaceId: string, userIds: string[]) => {
-  const membersData: SpaceMembersCreateManyInput[] = userIds.map((userId) => ({
+  const membersData: Prisma.SpaceMembersCreateManyInput[] = userIds.map((userId) => ({
     spaceId,
     userId,
     status: "active",
@@ -324,7 +324,7 @@ export const findCreatorsByMapId = async (mapId: string) => {
     select: { creatorId: true },
     distinct: ['creatorId']
   });
-  return spaces.map((s : any) => s.creatorId);
+  return spaces.map((s: any) => s.creatorId);
 };
 
 export const findSlugsByMapId = async (mapId: string) => {

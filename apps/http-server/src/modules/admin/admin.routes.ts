@@ -1,6 +1,6 @@
 import express, { Router } from 'express'
 import { adminDashboard, adminVerifyToken, logout, toggleUserStatus } from './admin.controller.js'
-import { adminMiddleware } from 'src/shared/middleware/auth.middleware.js'
+import { adminMiddleware } from '../../shared/middleware/auth.middleware.js'
 
 const router:Router = express.Router()
 
