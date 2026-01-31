@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: townify-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - townify-network
+
+  http-server:
+    build:
+      context: .
+      dockerfile: apps/http-server/Dockerfile
+    container_name: http-server
+    ports:
+      - "8080:8080"
+    environment:
+      - REDIS_PUBSUB_URL=redis://redis:6379
+      - PORT=8080
+    env_file:
+      - ./apps/http-server/.env
+    depends_on:
+      - redis
+    networks:
+      - townify-network
+
+networks:
+  townify-network:
+    driver: bridge
