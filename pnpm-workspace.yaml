@@ -4,8 +4,8 @@ packages:
 
 catalogs:
   prisma:
-    '@prisma/client': ^7.1.0
-    prisma: latest
+    '@prisma/client': ^7.3.0
+    prisma: ^7.3.0
 
 ignoredBuiltDependencies:
   - '@prisma/engines'

@@ -26,6 +26,7 @@ export const login = async (req: Request, res: Response) => {
     else if (err.message === "USER_BLOCKED") {
       return res.status(403).json({ message: "User account is blocked" });
     }
+    console.log(err);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
