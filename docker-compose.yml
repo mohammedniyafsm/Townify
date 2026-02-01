@@ -26,6 +26,38 @@ services:
     networks:
       - townify-network
 
+  ws-server:
+    build:
+      context: .
+      dockerfile: apps/ws-server/Dockerfile
+    container_name: ws-server
+    ports:
+      - "3008:3008"
+    env_file:
+      - ./apps/ws-server/.env
+    depends_on:
+      - redis
+    networks:
+      - townify-network
+
+  notification-ws:
+    build:
+      context: .
+      dockerfile: apps/notification-ws/Dockerfile
+    container_name: notification-ws
+    ports:
+      - "3010:3010"
+    environment:
+      - REDIS_PUBSUB_URL=redis://redis:6379
+      - PORT=3010
+    env_file:
+      - ./apps/notification-ws/.env
+    depends_on:
+      - redis
+    networks:
+      - townify-network
+
+    
 networks:
   townify-network:
     driver: bridge
