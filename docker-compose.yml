@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   redis:
     image: redis:7-alpine
@@ -33,6 +31,9 @@ services:
     container_name: ws-server
     ports:
       - "3008:3008"
+    environment:
+      - REDIS_PUBSUB_URL=redis://redis:6379
+      - PORT=3008
     env_file:
       - ./apps/ws-server/.env
     depends_on:
@@ -57,7 +58,6 @@ services:
     networks:
       - townify-network
 
-    
 networks:
   townify-network:
     driver: bridge

@@ -9,6 +9,7 @@ COPY package.json  pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/http-server ./apps/http-server
 COPY packages ./packages
 
+# Install TypeScript globally for workspace packages that need tsc command
 RUN npm add -g typescript
 RUN pnpm install --frozen-lockfile
 
@@ -19,7 +20,7 @@ RUN pnpm db:generate
 
 WORKDIR /app
 
-RUN pnpm run build 
+RUN pnpm turbo run build --filter=http-server... 
 
 WORKDIR /app/apps/http-server 
 

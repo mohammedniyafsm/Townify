@@ -9,6 +9,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/notification-ws ./apps/notification-ws 
 COPY packages  ./packages
 
+# Install TypeScript globally for workspace packages that need tsc command
 RUN npm add -g typescript
 RUN pnpm install --frozen-lockfile
 
