@@ -47,4 +47,35 @@ export interface UserSpace {
   spaceMembers: spaceMembersI[]
 }
 
+export interface Avatar {
+  id: string;
+  name: string;
+  idle : string;
+  walkSheet: string;
+}
+
+export interface AllAvatarsModalI {
+  openModal: boolean;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+  currentAvatar: Avatar | null ;
+  setCurrentAvatars: React.Dispatch<React.SetStateAction<Avatar | null>>;
+  avatars: Avatar[];
+}
+
+export interface AvatarSchema {
+  id: string;
+  name: string;
+  idle: string;        
+  walkSheet: string;   
+
+  frameWidth?: number;
+  frameHeight?: number;
+}
+
+export interface PlayerIdentity {
+  roomId :string,
+  userId: string;
+  name: string;
+  avatarId: string;
+}
 

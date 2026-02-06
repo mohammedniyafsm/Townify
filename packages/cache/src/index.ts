@@ -1,8 +1,8 @@
-import {Redis} from '@upstash/redis'
+import { Redis } from '@upstash/redis'
 
-const redis=new Redis({
-    url:process.env.UPSTASH_REDIS_REST_URL!,
-    token:process.env.UPSTASH_REDIS_REST_TOKEN!
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!
 })
 
 
@@ -17,11 +17,9 @@ export async function cacheGet<T>(key: string): Promise<T | null> {
   return redis.get<T>(key);
 }
 
-
 export async function cacheDel(key: string) {
   return redis.del(key);
 }
-
 
 // const data = await cacheWrap("users:list", 300, async () => {
 //   return db.user.findMany();
@@ -39,4 +37,73 @@ export async function cacheWrap<T>(
   return fresh;
 }
 
-export {redis}
+export async function deleteAllUsersCache() {
+  let cursor = 0;
+
+  do {
+    const [nextCursor, keys] = await redis.scan(cursor, {
+      match: 'users:*',
+      count: 100
+    });
+
+    cursor = Number(nextCursor);
+
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } while (cursor !== 0);
+}
+
+export async function deleteMapCache() {
+  let cursor = 0;
+
+  do {
+    const [nextCursor, keys] = await redis.scan(cursor, {
+      match: 'maps:*',
+      count: 100
+    });
+
+    cursor = Number(nextCursor);
+
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } while (cursor !== 0);
+}
+
+export async function deleteSpaceCache() {
+  let cursor = 0;
+
+  do {
+    const [nextCursor, keys] = await redis.scan(cursor, {
+      match: 'spaces:*',
+      count: 100
+    });
+
+    cursor = Number(nextCursor);
+
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } while (cursor !== 0);
+}
+
+export async function deleteAvatarCache() {
+  let cursor = 0;
+
+  do {
+    const [nextCursor, keys] = await redis.scan(cursor, {
+      match: 'avatars:*',
+      count: 100
+    });
+
+    cursor = Number(nextCursor);
+
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } while (cursor !== 0);
+}
+
+export { redis }
+export * from "./chat.redis.js";

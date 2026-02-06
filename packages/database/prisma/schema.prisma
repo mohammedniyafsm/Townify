@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -31,6 +31,7 @@ model User {
   password     String? // nullable because Google users have no password
   googleId     String? // stored only for Google OAuth
   authProvider AuthProvider @default(local) // enum
+  isActive     Boolean      @default(true)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   profile      String?
@@ -43,46 +44,76 @@ model User {
 }
 
 model Avatar {
-  id    String @id @default(uuid())
-  name  String
-  user  User[] @relation("UserAvatar")
-  walkSheet String
+  id         String    @id @default(uuid())
+  name       String
+  user       User[]    @relation("UserAvatar")
+  idle       String
+  walkSheet  String
 }
 
-
 model Map{
-  id String @id @default(uuid())
-  name String
-  thumbnail String
-  thumbnailId String
-  configJson Json
+  id               String        @id @default(uuid())
+  name             String
+  thumbnail        String
+  thumbnailId      String
+  configJson       Json
 
   spaces Space[]
 }
 
+model Space {
+  id              String      @id @default(uuid())
+  name            String
+  creatorId       String
+  mapId           String
+  slug            String      @unique @default(uuid())
+  createdAt       DateTime    @default(now())
 
-model Space{
-  id String @id @default(uuid())
-  name String
-  creatorId String
-  mapId String
-  slug String @unique @default(uuid())
+  creator   User @relation(fields: [creatorId], references: [id])
+  map       Map  @relation(fields: [mapId], references: [id])
 
-  map    Map   @relation(fields: [mapId] ,references: [id])
-  creator User @relation(fields: [creatorId], references: [id])
-
-  spaceMembers SpaceMembers[]
+  members  SpaceMembers[]
+  invites  SpaceInvite[]
 }
 
+enum MemberStatus {
+  active
+  blocked
+}
 
-model SpaceMembers{
-  id String @id @default(uuid())
-  slugId String 
-  userId String
-  isActive Boolean @default(true)
-  joinedAt DateTime @default(now())
+model SpaceMembers {
+  id            String         @id @default(uuid())
+  spaceId       String
+  userId        String
+  status        MemberStatus   @default(active)
+  joinedAt      DateTime       @default(now())
 
-  user User @relation(fields: [userId],references: [id])
-  space Space @relation(fields: [slugId], references: [slug])
+  space   Space @relation(fields: [spaceId], references: [id])
+  user    User  @relation(fields: [userId], references: [id])
 
+  @@unique([spaceId, userId])
+}
+
+enum InviteType {
+  email   
+  link    // user requested via shared link
+}
+
+enum InviteStatus {
+  pending
+  approved
+  rejected
+}
+
+model SpaceInvite {
+  id        String       @id @default(uuid())
+  spaceId   String
+  email     String?      // only for email invite
+  userId    String?      // set after login/signup
+  type      InviteType
+  status    InviteStatus @default(pending)
+  createdAt DateTime     @default(now())
+
+  space Space @relation(fields: [spaceId], references: [id])
+  @@unique([spaceId, email])
 }

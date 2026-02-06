@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { BorderBeam } from "@/components/ui/border-beam"
 import LandingNav from "@/components/Landing-page/LandingNav"
 import { GoogleIcon } from "@/components/icons/google"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { Spinner } from "@/components/ui/spinner"
 import { loginUser } from "@/api/authApi"
 import { toast } from "sonner"
@@ -28,7 +28,10 @@ import { addAuth } from "@/Redux/Slice/Auth/Auth"
 
 export function Login() {
   const navigate = useNavigate()
-  const dispatch=useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>()
+  const [searchParams] = useSearchParams();
+
+  const redirectParam = searchParams.get("redirect");
 
   const {
     register,
@@ -47,22 +50,22 @@ export function Login() {
 
       if (response) {
         const email = data.email
-
+        const otpUrl = redirectParam ? `/auth/otp?redirect=${redirectParam}` : "/auth/otp";
         toast.success("Login successful! Sending OTP...", {
           action: {
             label: "Verify OTP",
-            onClick: () => navigate("/auth/otp", { state: { email } }),
+            onClick: () => navigate(otpUrl, { state: { email } }),
           },
         })
 
         localStorage.setItem("otpEmail", email)
 
         setTimeout(() => {
-          navigate("/auth/otp", { state: { email } })
-        }, 1200)
+          navigate(otpUrl, { state: { email } })
+        }, 100)
       }
     } catch (error: any) {
-      toast.error(error.message||error?.response?.data?.message || "Invalid credentials")
+      toast.error(error?.response?.data?.message || error.message || "Invalid credentials")
       console.error(error)
     }
   }
@@ -70,16 +73,20 @@ export function Login() {
   const responseGoogle = async (authResult: any) => {
     try {
       if (authResult?.code) {
-        const response=await axios.get(`http://localhost:8080/auth/googleLogin?code=${authResult.code}`, {
+        const response = await axios.get(`http://localhost:8080/auth/googleLogin?code=${authResult.code}`, {
           withCredentials: true,
         })
         console.log(response.data)
         dispatch(addAuth(response.data.user))
+        if (response.data.user.role == 'admin') navigate("/admin")
+        else if (redirectParam) {
+          navigate(redirectParam)
+        }
+        else navigate("/")
         toast.success("Logged in with Google!")
-        navigate("/")
       }
     } catch (error: any) {
-      toast.error("Google login failed")
+      toast.error(error?.response?.data?.message || error.message || "Google login failed")
       console.error(error)
     }
   }
@@ -163,7 +170,14 @@ export function Login() {
               Don't have an account?{" "}
               <button
                 type="button"
-                onClick={() => navigate("/signup")}
+                onClick={() => {
+                  if (redirectParam) {
+                    navigate(`/signup?redirect=${redirectParam}`)
+                  }
+                  else {
+                    navigate("/signup")
+                  }
+                }}
                 className="font-medium underline underline-offset-4 hover:text-primary cursor-pointer"
               >
                 Sign up

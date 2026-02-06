@@ -5,7 +5,7 @@ export const MapCardShimmer = () => {
   return (
     <div className="">
       {/* Thumbnail shimmer */}
-      <Skeleton className="rounded-3xl h-72 w-96" />
+      <Skeleton className="rounded-3xl h-72 w-90" />
 
       {/* Bottom content shimmer */}
       <div className="flex justify-between px-1 py-2">

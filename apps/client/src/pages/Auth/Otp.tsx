@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { BorderBeam } from "@/components/ui/border-beam"
 import LandingNav from "@/components/Landing-page/LandingNav"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { resendOtpApi, verifyOTP } from "@/api/authApi"
@@ -24,7 +24,7 @@ export function OTP() {
 
     const navigate = useNavigate()
     const location = useLocation();
-    const dispatch=useDispatch<AppDispatch>()
+    const dispatch = useDispatch<AppDispatch>()
     const emailFromState = location.state?.email;
     const [sendOtp, setsendOtp] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -33,6 +33,8 @@ export function OTP() {
     console.log("EMAIL RECEIVED:", email);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
     inputRefs.current = Array(5).fill(null).map((_, i) => inputRefs.current[i] ?? null)
+    const [searchParams] = useSearchParams();
+    const redirectParam = searchParams.get("redirect");
 
     useEffect(() => {
         if (!sendOtp) return;   // Run only when sendOtp = true
@@ -64,7 +66,7 @@ export function OTP() {
     const handleSubmit = async (e: React.FormEvent) => {
         try {
             e.preventDefault();
-           
+
             const otp = getOTP();
             console.log("OTP Entered:", otp);
 
@@ -74,22 +76,24 @@ export function OTP() {
             }
             setLoading(true);
             const response = await verifyOTP({ email, otp });
+            const redirectUrl = redirectParam ? redirectParam : "/";
             console.log(response)
             if (response) {
                 dispatch(addAuth(response.data.user))
                 toast.success("LoggedIn Successful!.", {
                     action: {
                         label: "Home",
-                        onClick: () => navigate("/"),
+                        onClick: () => { response.data.role == 'admin' ? navigate("/admin") : navigate(redirectUrl) },
                     },
                 });
                 setTimeout(() => {
                     setLoading(false);
-                    navigate("/");
+                    navigate(redirectUrl);
                 }, 2000);
             }
-        } catch (error) {
+        } catch (error: any) {
             setLoading(false);
+            toast.error(error?.response?.data?.message || error.message || "Invalid OTP or Expired")
             console.log(error)
         }
     };
@@ -98,8 +102,8 @@ export function OTP() {
     const resendOtp = async () => {
         try {
             const response = await resendOtpApi({ email });
-
-            if (response.status === 200) {
+            console.log(response)
+            if (response.status === 202) {
                 toast.success("OTP sent successfully!");
 
                 setsendOtp(true);
@@ -107,13 +111,12 @@ export function OTP() {
             } else {
                 toast.error(response.data.message);
             }
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            console.log(error);
+            toast.error(error?.response?.data?.message || error.message)
             toast.error("Something went wrong");
         }
     };
-
-
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const value = e.target.value

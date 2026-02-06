@@ -1,0 +1,22 @@
+{
+  "name": "notification-ws",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b && bun ./dist/index.js"
+  },
+  "keywords": [],
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.19.0",
+  "dependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/ws": "^8.18.1",
+    "redis": "^5.10.0",
+    "typescript": "^5.9.3",
+    "ws": "^8.18.3"
+  }
+}

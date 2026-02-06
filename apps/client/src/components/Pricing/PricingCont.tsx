@@ -50,61 +50,84 @@ const pricingPlans = [
 
 function PricingCont() {
   return (
-    <div className="flex justify-center gap-8 items-start h-full py-4">
-      {pricingPlans.map((plan, index) => (
-        <Card key={index} 
-          className="relative w-[330px] overflow-hidden shadow-lg hover:shadow-2xl transition-transform duration-300 hover:scale-105"
->
-          <CardHeader>
-            <CardTitle className="text-2xl">{plan.title}</CardTitle>
-            <CardDescription className="text-black font-semibold text-lg">
-              {plan.price}
-            </CardDescription>
-          </CardHeader>
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="max-w-7xl mx-auto">
+        {/* Optional Header */}
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+            Choose Your Plan
+          </h2>
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+            Flexible pricing for teams of all sizes
+          </p>
+        </div>
 
-          <hr />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 justify-items-center">
+          {pricingPlans.map((plan, index) => (
+            <Card
+              key={index}
+              className="relative w-full max-w-sm overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] h-full flex flex-col"
+            >
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl sm:text-2xl md:text-3xl">{plan.title}</CardTitle>
+                <CardDescription className="text-black font-semibold text-lg sm:text-xl md:text-2xl mt-2">
+                  {plan.price}
+                </CardDescription>
+              </CardHeader>
 
-          <CardContent>
-            <h1 className="font-Inter text-sm font-semibold">{plan.tagline}</h1>
-          </CardContent>
+              <hr className="mx-4 sm:mx-6" />
 
-          <hr />
+              <CardContent className="py-4 sm:py-6">
+                <p className="font-Inter text-sm sm:text-base font-semibold text-center">
+                  {plan.tagline}
+                </p>
+              </CardContent>
 
-          <CardContent>
-            <div>
-              {plan.features.map((feature, i) => (
-                <h1
-                  key={i}
-                  className="flex gap-2 font-bricogrotesque text-sm py-1 font-semibold"
-                >
-                  <CheckCircleIcon size={20} className="inline-block" />
-                  {feature}
-                </h1>
-              ))}
-            </div>
-          </CardContent>
+              <hr className="mx-4 sm:mx-6" />
 
-          <hr />
+              <CardContent className="py-4 sm:py-6 flex-grow">
+                <ul className="space-y-2 sm:space-y-3">
+                  {plan.features.map((feature, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 sm:gap-3 font-bricogrotesque text-xs sm:text-sm md:text-base"
+                    >
+                      <CheckCircleIcon
+                        size={16}
+                        className="text-green-500 flex-shrink-0 mt-0.5 sm:mt-1"
+                      />
+                      <span className="leading-tight sm:leading-normal">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
 
-          <CardFooter className="flex justify-center">
-            <RainbowButton className="w-72">Get Started</RainbowButton>
-          </CardFooter>
+              <hr className="mx-4 sm:mx-6" />
 
-          {/* Border effects */}
-          <BorderBeam
-            duration={6}
-            size={400}
-            className="from-transparent via-red-500 to-transparent"
-          />
-          <BorderBeam
-            duration={6}
-            delay={3}
-            size={400}
-            borderWidth={2}
-            className="from-transparent via-blue-500 to-transparent"
-          />
-        </Card>
-      ))}
+              <CardFooter className="py-6 sm:py-8">
+                <RainbowButton className="w-full text-sm sm:text-base px-4 py-3 sm:py-4">
+                  Get Started
+                </RainbowButton>
+              </CardFooter>
+
+              {/* Border effects - responsive size */}
+              <BorderBeam
+                duration={6}
+                size={300}
+                className="from-transparent via-red-500 to-transparent hidden sm:block"
+              />
+              <BorderBeam
+                duration={6}
+                delay={3}
+                size={300}
+                borderWidth={2}
+                className="from-transparent via-blue-500 to-transparent hidden sm:block"
+              />
+            </Card>
+          ))}
+        </div>
+
+      </div>
     </div>
   );
 }
