@@ -22,6 +22,7 @@ export interface SpaceI {
   mapId: string;
   slug: string;
   createdAt: string; // ISO date string
+
   creator?: UserI;
   map?: MapSchemaI;
   members?: SpaceMembersI[];
