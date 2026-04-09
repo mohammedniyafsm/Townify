@@ -10,6 +10,7 @@ import { ProtectedLoading } from "./components/JoinRoom/Loading";
 export const ProtectedRoute = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const hasFetched = useRef(false);
+  
 
   useEffect(() => {
     if (hasFetched.current) return;
