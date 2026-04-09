@@ -17,10 +17,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
   private isSitting = false;
 
-  get sitting() {
-    return this.isSitting;
-  }
-
   // name tag
   private nameTag: Phaser.GameObjects.Container;
   private nameText: Phaser.GameObjects.Text;

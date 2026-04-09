@@ -56,11 +56,13 @@ function process(scene: any, message: ServerMessage) {
       break;
 
     case "USER_NEARBY_ENTER":
+      console.log("USER_NEARBY_ENTER", message.payload);
       const enterId = (message.payload as any).targetUserId || (message.payload as any).userId;
       if (enterId) store.dispatch(addNearbyUser(enterId));
       break;
 
     case "USER_NEARBY_LEAVE":
+      console.log("USER_NEARBY_LEAVE", message.payload);
       const leaveId = (message.payload as any).targetUserId || (message.payload as any).userId;
       if (leaveId) store.dispatch(removeNearbyUser(leaveId));
 
@@ -71,6 +73,8 @@ function process(scene: any, message: ServerMessage) {
       const joinUserId = message.payload.userId;
       const joinSpaceId = message.payload.spaceId;
       const currentUserId = store.getState().user.user?.id;
+      console.log("USER_JOINED_SPACE", joinUserId, joinSpaceId, currentUserId);
+
       if (joinUserId === currentUserId) {
         store.dispatch(setSelfSpaceId(joinSpaceId));
       }
@@ -82,6 +86,7 @@ function process(scene: any, message: ServerMessage) {
     case "USER_LEFT_SPACE": {
       const leftUserId = message.payload.userId;
       const myId = store.getState().user.user?.id;
+      console.log("USER_LEFT_SPACE", leftUserId, myId);
       if (leftUserId === myId) {
         store.dispatch(removeAllSpaceUser());
         store.dispatch(setSelfSpaceId(null));
@@ -138,10 +143,12 @@ function process(scene: any, message: ServerMessage) {
       break;
 
     case "SPACE_CHAT":
-        pushMessage(message.payload);
+      console.log("Processing SPACE_CHAT");
+      pushMessage(message.payload);
       break;
 
     case "ROOM_CHAT":
+      console.log("Processing ROOM_CHAT");
       pushMessage({
         ...message.payload,
         spaceId: MAIN_SPACE.id,
@@ -149,10 +156,12 @@ function process(scene: any, message: ServerMessage) {
       break;
 
     case "SPACE_CHAT_HISTORY":
+      console.log("Processing SPACE_CHAT_HISTORY", message.payload.history.length);
       bulkAddMessages(message.payload.history);
       break;
 
     case "ROOM_CHAT_HISTORY":
+      console.log("Processing ROOM_CHAT_HISTORY", message.payload.history.length);
       bulkAddMessages(message.payload.history);
       break;
 

@@ -15,10 +15,6 @@ export default function createConfig(
     parent: "game-container",
     pixelArt: true,
     audio: { noAudio: true },
-    fps: {
-      target: 60,
-      smoothStep: true,
-    },
     physics: {
       default: "arcade",
       arcade: { debug: true },
