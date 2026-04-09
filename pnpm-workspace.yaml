@@ -4,10 +4,15 @@ packages:
 
 catalogs:
   prisma:
-    '@prisma/client': ^7.3.0
-    prisma: ^7.3.0
+    '@prisma/client': ^7.1.0
+    prisma: latest
 
 ignoredBuiltDependencies:
   - '@prisma/engines'
   - '@scarf/scarf'
   - prisma
+
+onlyBuiltDependencies:
+  - esbuild
+  - bcrypt
+  - '@parcel/watcher'

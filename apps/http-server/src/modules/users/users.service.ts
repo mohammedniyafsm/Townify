@@ -38,12 +38,12 @@ export const updateUserProfileService = async ({
         const { success, result } = await uploadToCloudinary(file.path, {
             folder: "townify/users",
         });
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path)
+        if(fs.existsSync(file.path)) fs.unlinkSync(file.path)
         if (!success) throw new Error("UPLOAD_FAILED");
 
         data.profile = result?.secure_url;
     }
     await cacheDel("users:list")
-    await cacheDel(`users:me:${userId}`)
+    
     return updateUser(userId, data);
 };

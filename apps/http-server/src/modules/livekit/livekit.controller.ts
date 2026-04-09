@@ -10,11 +10,11 @@ const apiSecret = process.env.LIVEKIT_API_SECRET;
 export const getToken = async (req: Request, res: Response) => {
   const { roomName, participantId, participantName, avatarImage } = req.body;
 
-  if (!roomName || !participantId || !participantName) {
-    res.status(400).json({ errorMessage: "roomName, participantId, and participantName are required" });
+  if (!roomName || !participantId || !participantName || !avatarImage) {
+    res.status(400).json({ errorMessage: "roomName, participantId, participantName, and avatarImage are required" });
     return;
   }
-
+  
   if (!apiKey || !apiSecret) {
     res.status(500).json({ errorMessage: "LiveKit API key or secret not configured" });
     return;

@@ -57,6 +57,16 @@ export default class MainScene extends Phaser.Scene {
   private spaces: Phaser.Types.Tilemaps.TiledObject[] = [];
   private currentSpaceId: string | null = null;
 
+  // sit/stand prompt UI
+  private promptContainer!: Phaser.GameObjects.Container;
+  private promptLabel!: Phaser.GameObjects.Text;
+  private promptBg!: Phaser.GameObjects.Graphics;
+  private promptPressText!: Phaser.GameObjects.Text;
+  private promptKeyBg!: Phaser.GameObjects.Graphics;
+  private promptKeyText!: Phaser.GameObjects.Text;
+  private promptKeyBoxW = 0;
+  private promptKeyBoxH = 0;
+
 
   constructor(
     mapUrl: string,
@@ -130,6 +140,9 @@ export default class MainScene extends Phaser.Scene {
 
     new CameraController(this, map.widthInPixels, map.heightInPixels);
 
+    // ---- PROMPT UI ----
+    this.createPromptUI();
+
     this.isReady = true;
     setMainScene(this);
     flushPendingMessages();
@@ -181,6 +194,27 @@ export default class MainScene extends Phaser.Scene {
       if (spaceId !== this.currentSpaceId) {
         this.currentSpaceId = spaceId;
         this.onSpaceChanged(space);
+      }
+    }
+
+    // ---- PROMPT VISIBILITY ----
+    if (this.localPlayer && this.promptContainer) {
+      if (this.localPlayer.sitting) {
+        if (this.promptLabel.text !== "to stand") {
+          this.promptLabel.setText("to stand");
+          this.updatePromptLayout();
+        }
+        this.promptContainer.setPosition(this.localPlayer.x, this.localPlayer.y + 25);
+        this.promptContainer.setVisible(true);
+      } else if (this.getNearbyChair(this.localPlayer)) {
+        if (this.promptLabel.text !== "to sit") {
+          this.promptLabel.setText("to sit");
+          this.updatePromptLayout();
+        }
+        this.promptContainer.setPosition(this.localPlayer.x, this.localPlayer.y + 25);
+        this.promptContainer.setVisible(true);
+      } else {
+        this.promptContainer.setVisible(false);
       }
     }
 
@@ -345,6 +379,65 @@ export default class MainScene extends Phaser.Scene {
   }
 
 
+
+  private createPromptUI() {
+    const fontSize = "12px";
+    const fontConfig = {
+      fontSize,
+      color: "#ffffff",
+      fontFamily: "DM Sans, sans-serif",
+    };
+
+    this.promptPressText = this.add.text(0, 0, "Press", fontConfig).setOrigin(0, 0.5);
+
+    this.promptKeyText = this.add.text(0, 0, "E", {
+      fontSize,
+      color: "#000000",
+      fontStyle: "bold",
+    }).setOrigin(0.5);
+
+    const keyPad = 2;
+    this.promptKeyBoxW = this.promptKeyText.width + keyPad * 2 + 6;
+    this.promptKeyBoxH = this.promptKeyText.height + keyPad * 2;
+
+    this.promptKeyBg = this.add.graphics();
+    this.promptKeyBg.fillStyle(0xffffff, 1);
+    this.promptKeyBg.fillRoundedRect(-this.promptKeyBoxW / 2, -this.promptKeyBoxH / 2, this.promptKeyBoxW, this.promptKeyBoxH, 3);
+    this.promptKeyBg.lineStyle(1, 0x888888, 1);
+    this.promptKeyBg.strokeRoundedRect(-this.promptKeyBoxW / 2, -this.promptKeyBoxH / 2, this.promptKeyBoxW, this.promptKeyBoxH, 3);
+
+    this.promptLabel = this.add.text(0, 0, "to sit", fontConfig).setOrigin(0, 0.5);
+
+    this.promptBg = this.add.graphics();
+
+    this.promptContainer = this.add.container(
+      0, 0,
+      [this.promptBg, this.promptKeyBg, this.promptKeyText, this.promptPressText, this.promptLabel]
+    );
+    this.promptContainer.setDepth(1000);
+    this.promptContainer.setVisible(false);
+
+    this.updatePromptLayout();
+  }
+
+  private updatePromptLayout() {
+    const padX = 8;
+    const gap = 6;
+    const totalW = padX + this.promptPressText.width + gap + this.promptKeyBoxW + gap + this.promptLabel.width + padX;
+    const totalH = Math.max(this.promptKeyBoxH, this.promptPressText.height) + 8;
+
+    this.promptBg.clear();
+    this.promptBg.fillStyle(0x000000, 0.65);
+    this.promptBg.fillRoundedRect(-totalW / 2, -totalH / 2, totalW, totalH, 8);
+
+    let cx = -totalW / 2 + padX;
+    this.promptPressText.setPosition(cx, 0);
+    cx += this.promptPressText.width + gap;
+    this.promptKeyBg.setPosition(cx + this.promptKeyBoxW / 2, 0);
+    this.promptKeyText.setPosition(cx + this.promptKeyBoxW / 2, 0);
+    cx += this.promptKeyBoxW + gap;
+    this.promptLabel.setPosition(cx, 0);
+  }
 
   // 🔥 IMPORTANT FIX: animations PER avatar
   private createAvatarAnimations() {

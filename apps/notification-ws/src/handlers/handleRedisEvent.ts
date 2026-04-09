@@ -45,28 +45,17 @@ export function handleRedisEvent(event: SpaceEvent) {
 
 
     case "USER_BLOCKED": {
-      console.log("[USER_BLOCKED] Event received with payload:", payload);
-      console.log("[USER_BLOCKED] Target userId:", payload.userId);
-      console.log("[USER_BLOCKED] Current online users:", Array.from(onlineUsers.keys()));
-
+     
       const userWs = onlineUsers.get(payload.userId);
-      console.log("[USER_BLOCKED] Found WebSocket:", !!userWs);
-      console.log("[USER_BLOCKED] WebSocket ready state:", userWs?.readyState);
 
       if (userWs?.readyState === WebSocket.OPEN) {
-        console.log("[USER_BLOCKED] ✅ Sending USER_BLOCKED message to user:", payload.userId);
         const message = JSON.stringify({
           type: "USER_BLOCKED",
           payload: {
             spaceName: payload.spaceName,
           },
         });
-        console.log("[USER_BLOCKED] Message content:", message);
         userWs.send(message);
-        console.log("[USER_BLOCKED] ✅ Message sent successfully");
-      } else {
-        console.log("[USER_BLOCKED] ❌ Cannot send - WebSocket not open or not found");
-        console.log("[USER_BLOCKED] User might not be connected to notification-ws");
       }
       break;
     }

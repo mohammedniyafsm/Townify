@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
+import { useDispatch, useSelector } from "react-redux";
 import LobbyContent from "@/components/RoomLobby/LobbyContent";
 import RoomLobbyNAv from "@/components/RoomLobby/RoomLobbyNAv";
 
@@ -9,19 +9,27 @@ import BlockedUser from "@/components/JoinRoom/BlockedUser";
 import SpaceNotFound from "@/components/JoinRoom/SpaceNotFound";
 
 import { checkSpaceAccess } from "@/api/SpaceApi";
+import type { AppDispatch, RootState } from "@/Redux/stroe";
+import { fetchSpaceDetails } from "@/Redux/Slice/ManageSpace/ManageSpaceThunk";
 
 type LobbyState = "loading" | "allowed" | "blocked" | "not-found";
 
 function RoomLobby() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const dispatch=useDispatch<AppDispatch>()
+  const spaceUser=useSelector((state:RootState)=>state.manageSpace)
 
   const [state, setState] = useState<LobbyState>("loading");
 
   useEffect(() => {
     const verifyAccess = async () => {
       try {
-        await checkSpaceAccess(slug as string);
+       const res = await checkSpaceAccess(slug as string);
+       if(res.data.role === "owner" && spaceUser.status!=='succeeded'){
+
+        await dispatch(fetchSpaceDetails(slug as string)).unwrap()
+       }
         setState("allowed"); // ✅ member or owner
       } catch (error: any) {
         const message = error?.response?.data?.message;

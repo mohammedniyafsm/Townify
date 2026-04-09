@@ -127,7 +127,6 @@ export const toggleMember = async (req: Request, res: Response) => {
       req.user!.userId,
       req.params.userId as string
     );
-    console.log("[BLOCKING] Member toggled:", { status: blocked.status, userId: req.params.userId, slug: req.params.slug });
     if (blocked.status === "blocked") {
       const event = {
         type: "USER_BLOCKED",
@@ -136,12 +135,10 @@ export const toggleMember = async (req: Request, res: Response) => {
           spaceName: req.params.slug,
         },
       };
-      console.log("[BLOCKING] Publishing to Redis:", event);
       await redisPublisher.publish(
         "SPACE_EVENTS",
         JSON.stringify(event)
       );
-      console.log("[BLOCKING] Event published successfully");
     }
     res.json({ status: blocked.status });
   } catch (e: any) {

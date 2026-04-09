@@ -6,6 +6,7 @@ import {
   RemoteParticipant,
   LocalVideoTrack,
   LocalAudioTrack,
+  AudioPresets,
 } from "livekit-client";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -52,6 +53,7 @@ export const LiveKitProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isConnected, setIsConnected] = useState(false);
 
   const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL || "ws://localhost:7880";
+  console.log("LiveKit URL:", LIVEKIT_URL);
 
   const disconnect = async () => {
     if (activeLkRoom) {
@@ -72,7 +74,6 @@ export const LiveKitProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   async function connect(targetRoomName: string) {
     console.log(`[LiveKit] Connecting to: ${targetRoomName}`);
-
     if (activeLkRoom) {
       await activeLkRoom.disconnect();
     }
@@ -80,11 +81,21 @@ export const LiveKitProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const room = new Room({
       adaptiveStream: true,
       dynacast: true,
+      audioCaptureDefaults: {
+        sampleRate: 48000,
+        sampleSize: 24,
+        channelCount: 2,
+        noiseSuppression: false,
+        autoGainControl: false,
+      },
       publishDefaults: {
         videoEncoding: {
           maxBitrate: 1_200_000,
           maxFramerate: 25,
         },
+        audioPreset: AudioPresets.musicHighQualityStereo,
+        dtx: false,
+        red: true,
       },
     });
 
@@ -104,7 +115,6 @@ export const LiveKitProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const avatarImage = user?.avatar?.idle || "";
       const response = await getLiveKitToken(targetRoomName, user?.name || "", user?.id || "", avatarImage);
       await room.connect(LIVEKIT_URL, response.data.token);
-
       // Apply our pre-existing intent to the room
       if (isAudioEnabled) {
         try {

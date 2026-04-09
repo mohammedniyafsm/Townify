@@ -16,7 +16,6 @@ export const handleMessage = async (ws: WebSocket, rawMessage: WebSocket.RawData
         const { type, payload } = JSON.parse(rawMessage.toString()) as MessageI;
         if (!type || typeof type !== "string") return;
 
-        // Ensure payload is an object even if missing
         const safePayload = (payload && typeof payload === "object") ? payload : {};
         const { userId, name, roomId, x, y, avatarId, isSitting, chairId, facing } = safePayload;
         switch (type) {

@@ -10,7 +10,11 @@
     "dev": "bun --watch src/index.ts"
   },
   "dependencies": {
-    "@types/node": "^24.10.1",
     "@upstash/redis": "^1.30.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
   }
 }

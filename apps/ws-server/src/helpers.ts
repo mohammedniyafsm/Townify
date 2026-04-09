@@ -14,8 +14,7 @@ export const isNear = (a: UserI, b: UserI) => {
 export const userMoved = (room: RoomI, user: UserI, userId: string) => {
   for (const [otherId, otherUser] of room.users) {
     if (userId == otherId) continue;
-    // ISOLATION RULE: If either user is in a space, they cannot see each other via proximity
-    // (Proximity only works for users in the "global" area)
+
     if (user.spaceId || otherUser.spaceId) continue;
 
     const near = isNear(user, otherUser);
@@ -23,7 +22,6 @@ export const userMoved = (room: RoomI, user: UserI, userId: string) => {
     if (near && !aldready) {
       user.neighbours.add(otherId);
       otherUser.neighbours.add(userId);
-      console.log(`[Proximity] ${userId} Entered ${otherId}`);
       sendToUser(room.sockets, userId, {
         type: "USER_NEARBY_ENTER",
         payload: { targetUserId: otherId },
@@ -36,7 +34,6 @@ export const userMoved = (room: RoomI, user: UserI, userId: string) => {
     if (!near && aldready) {
       user.neighbours.delete(otherId);
       otherUser.neighbours.delete(userId);
-      console.log(`[Proximity] ${userId} Left ${otherId}`);
       sendToUser(room.sockets, userId, {
         type: "USER_NEARBY_LEAVE",
         payload: { targetUserId: otherId },
@@ -56,7 +53,6 @@ export const cleanUpUser = (room: RoomI, userId: string) => {
   for (const neighborId of user.neighbours) {
     const otherUser = room.users.get(neighborId);
     if (!otherUser) continue;
-    console.log(`[Proximity] Force Cleanup: ${userId} Leaving ${neighborId}`);
     sendToUser(room.sockets, neighborId, {
       type: "USER_NEARBY_LEAVE",
       payload: { targetUserId: userId },
@@ -74,7 +70,7 @@ export const cleanUpUser = (room: RoomI, userId: string) => {
 const sendToUser = (
   sockets: Map<string, WebSocket>,
   userId: string,
-  message: any
+  message: any  
 ) => {
   const socket = sockets.get(userId);
   if (!socket) return;
