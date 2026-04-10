@@ -1,0 +1,50 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm ci
+
+      # Write .env files for each app using corresponding secret
+      - name: Write CLIENT .env
+        run: echo "${{ secrets.CLIENT }}" > apps/client/.env
+
+      - name: Write HTTP .env
+        run: echo "${{ secrets.HTTP }}" > apps/http-server/.env
+
+      - name: Write WS .env
+        run: echo "${{ secrets.WS }}" > apps/ws-server/.env
+
+      - name: Write NOTIFICATION .env
+        run: echo "${{ secrets.NOTIFICATION }}" > apps/notification-ws/.env
+
+      - name: Write DATABASE .env
+        run: echo "${{ secrets.DATABASE }}" > packages/database/.env
+
+      - name: Write CACHE .env
+        run: echo "${{ secrets.CACHE }}" > packages/cache/.env
+
+      - name: Build
+        run: pnpm run build --if-present
+      - name: pm2 restart
+        run: pm2 restart all
