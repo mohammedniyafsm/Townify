@@ -47,6 +47,6 @@ jobs:
         run: echo "${{ secrets.CACHE }}" > packages/cache/.env
 
       - name: Build
-        run: pnpm run build --if-present
+        run: pnpm run build
       - name: pm2 restart
         run: pm2 restart all
