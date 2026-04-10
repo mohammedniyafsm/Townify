@@ -7,6 +7,7 @@ interface Props {
   activeSpaceId: string;
   currentSubSpace: SpaceInfo | null;
   onClose: () => void;
+  unreadCounts: Record<string, number>;
 }
 
 export default function DashBoardChat({
@@ -14,6 +15,7 @@ export default function DashBoardChat({
   activeSpaceId,
   currentSubSpace,
   onClose,
+  unreadCounts,
 }: Props) {
 
   // Dynamic list: Always Main Space + Current Sub Space (if in one)
@@ -65,6 +67,13 @@ export default function DashBoardChat({
                   {isMain ? "Global Room Chat" : "Private Area Chat"}
                 </div>
               </div>
+
+              {/* Unread badge */}
+              {(unreadCounts[space.id] ?? 0) > 0 && (
+                <span className="min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 shrink-0">
+                  {unreadCounts[space.id] > 9 ? "9+" : unreadCounts[space.id]}
+                </span>
+              )}
             </div>
           );
         })}

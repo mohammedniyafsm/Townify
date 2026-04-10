@@ -5,6 +5,7 @@ import { useLiveKit } from "@/contexts/LiveKitContext";
 import MembersModal from "./Modal";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/Redux/stroe";
+import { useUnreadCounts } from "@/hooks/useSpaceChat";
 
 interface GameControlsProps {
     totalMembers: number;
@@ -21,6 +22,12 @@ export default function GameControls({
     const navigate = useNavigate();
     const { isAudioEnabled, isVideoEnabled, toggleAudio, toggleVideo, disconnect } = useLiveKit();
     const manageSpace = useSelector((state: RootState) => state.manageSpace);
+    const unreadCounts = useUnreadCounts();
+
+    const totalUnread = useMemo(
+        () => Object.values(unreadCounts).reduce((a, b) => a + b, 0),
+        [unreadCounts]
+    );
 
     const pendingInviteCount = useMemo(() => {
         return manageSpace.spaces?.invites?.filter(
@@ -98,7 +105,14 @@ export default function GameControls({
                     title={isChatOpen ? "Close chat" : "Open chat"}
                     aria-label={isChatOpen ? "Close chat" : "Open chat"}
                 >
-                    <MessageSquare className="w-5 h-5" />
+                    <div className="relative">
+                        <MessageSquare className="w-5 h-5" />
+                        { totalUnread > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 leading-none">
+                                {totalUnread > 9 ? "9+" : totalUnread}
+                            </span>
+                        )}
+                    </div>
                 </button>
 
                 {/* Leave Button */}

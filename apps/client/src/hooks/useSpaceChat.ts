@@ -10,6 +10,56 @@ export type ChatMessage = {
   timestamp: number;
 };
 
+// ─── Unread counts ────────────────────────────────────────────────────────────
+let unreadCounts: Record<string, number> = {};
+let activeChatSpaceId: string | null = null;
+let unreadListeners: (() => void)[] = [];
+
+const notifyUnread = () => unreadListeners.forEach(l => l());
+
+// ─── Notification sound ───────────────────────────────────────────────────────
+const _notifAudio = typeof Audio !== "undefined" ? new Audio("/notification.mp3") : null;
+if (_notifAudio) _notifAudio.volume = 0.5;
+
+const playNotificationSound = () => {
+  if (!_notifAudio) return;
+  _notifAudio.currentTime = 0;
+  _notifAudio.play().catch(() => { /* autoplay blocked before first user gesture */ });
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const setActiveChatSpace = (id: string | null) => {
+  activeChatSpaceId = id;
+  if (id && unreadCounts[id]) {
+    unreadCounts = { ...unreadCounts, [id]: 0 };
+    notifyUnread();
+  }
+};
+
+export const clearUnreadForSpace = (spaceId: string) => {
+  if (!unreadCounts[spaceId]) return;
+  unreadCounts = { ...unreadCounts, [spaceId]: 0 };
+  notifyUnread();
+};
+
+const incrementUnread = (spaceId: string) => {
+  if (!spaceId || spaceId === activeChatSpaceId) return;
+  unreadCounts = { ...unreadCounts, [spaceId]: (unreadCounts[spaceId] || 0) + 1 };
+  playNotificationSound();
+  notifyUnread();
+};
+
+export const useUnreadCounts = () => {
+  const [counts, setCounts] = useState<Record<string, number>>({ ...unreadCounts });
+  useEffect(() => {
+    const handler = () => setCounts({ ...unreadCounts });
+    unreadListeners.push(handler);
+    return () => { unreadListeners = unreadListeners.filter(l => l !== handler); };
+  }, []);
+  return counts;
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
 const globalMessages: ChatMessage[] = [];
 let listeners: ((msg: ChatMessage | ChatMessage[]) => void)[] = [];
 
@@ -42,6 +92,8 @@ export const pushMessage = (rawMsg: any) => {
 
   globalMessages.push(msg);
   listeners.forEach((l) => l(msg));
+
+  if (msg.spaceId) incrementUnread(msg.spaceId);
 };
 
 export const bulkAddMessages = (msgs: any[]) => {

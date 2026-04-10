@@ -18,6 +18,7 @@ interface Props {
   onSend: (text: string) => void;
   onBack?: () => void;
   onClose?: () => void;
+  otherUnreadCount?: number;
 }
 
 const formatTime = (ts: number | undefined) => {
@@ -37,6 +38,7 @@ export default function ChatPanel({
   onSend,
   onBack,
   onClose,
+  otherUnreadCount,
 }: Props) {
   const [text, setText] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
@@ -77,10 +79,14 @@ export default function ChatPanel({
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-zinc-950">
         <div className="flex items-center gap-3">
           {onBack && (
-            <ArrowLeft
-              className="w-5 h-5 cursor-pointer text-gray-400 hover:text-white"
-              onClick={onBack}
-            />
+            <div className="relative cursor-pointer" onClick={onBack}>
+              <ArrowLeft className="w-5 h-5 text-gray-400 hover:text-white" />
+              {otherUnreadCount && otherUnreadCount > 0 ? (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 leading-none">
+                  {otherUnreadCount > 9 ? "9+" : otherUnreadCount}
+                </span>
+              ) : null}
+            </div>
           )}
           <div className="flex flex-col">
             <span className="font-bold text-sm">{title}</span>

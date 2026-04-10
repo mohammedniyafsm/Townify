@@ -3,6 +3,7 @@ import DashBoardChat from "./DashBoardChat";
 import SpaceChatPanel from "./SpaceChatPanel";
 import { MAIN_SPACE } from "./constants";
 import { subscribeToSpace } from "@/game/scenes/sceneRegistry";
+import { useUnreadCounts, clearUnreadForSpace } from "@/hooks/useSpaceChat";
 
 export type SpaceInfo = { id: string; name: string };
 type ChatView = "dashboard" | "space";
@@ -18,6 +19,7 @@ export default function ChatContainer({ isOpen, onOpen, onClose }: Props) {
   const [activeSpace, setActiveSpace] = useState<SpaceInfo>(MAIN_SPACE);
   const [currentSubSpace, setCurrentSubSpace] = useState<SpaceInfo | null>(null);
   const prevSpaceIdRef = useRef<string | null>(null);
+  const unreadCounts = useUnreadCounts();
 
   useEffect(() => {
     return subscribeToSpace(space => {
@@ -32,6 +34,7 @@ export default function ChatContainer({ isOpen, onOpen, onClose }: Props) {
         }
         onOpen();
       } else {
+        if (prevSpaceIdRef.current) clearUnreadForSpace(prevSpaceIdRef.current);
         prevSpaceIdRef.current = null;
         setActiveSpace(MAIN_SPACE);
         setView("space");
@@ -47,6 +50,7 @@ export default function ChatContainer({ isOpen, onOpen, onClose }: Props) {
       <DashBoardChat
         activeSpaceId={activeSpace.id}
         currentSubSpace={currentSubSpace}
+        unreadCounts={unreadCounts}
         onOpenSpace={space => {
           setActiveSpace(space);
           setView("space");
