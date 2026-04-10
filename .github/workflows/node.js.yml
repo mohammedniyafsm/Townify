@@ -2,9 +2,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 
 jobs:
   build:
@@ -20,10 +20,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+
+      - name: Install Pnpm
+        run: npm install -g pnpm
 
       - name: Install dependencies
-        run: pnpm ci
+        run: pnpm install
 
       # Write .env files for each app using corresponding secret
       - name: Write CLIENT .env
@@ -45,6 +47,6 @@ jobs:
         run: echo "${{ secrets.CACHE }}" > packages/cache/.env
 
       - name: Build
-        run: pnpm run build --if-present
+        run: pnpm run build
       - name: pm2 restart
         run: pm2 restart all
