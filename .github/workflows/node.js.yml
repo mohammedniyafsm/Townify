@@ -48,5 +48,8 @@ jobs:
 
       - name: Build
         run: pnpm run build
+
+      - name: pm2 install
+        run: pm2 install 
       - name: pm2 restart
         run: pm2 restart all
