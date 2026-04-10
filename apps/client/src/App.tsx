@@ -27,7 +27,6 @@ import AvatarPage from "./pages/Admin/Avatar/Avatars";
 import { fetchUserSpacesThunk } from "./Redux/Slice/UserSpace/UserSpaceThunk";
 import { AdminProtectedRoute, ProtectedRoute } from "./AuthMiddleware";
 import Profile from "./pages/Profile";
-import DashBoardChat from "./components/Space-Chat/DashBoardChat";
 import { useNotificationSocket } from "./hooks/useNotificationSocket";
 import JoinApprovalToast from "./components/Notification/User/JoinApprovalToast";
 import JoinRequestToast from "./components/Notification/Admin/JoinRequestToast";
@@ -88,7 +87,7 @@ function App() {
             <Route path="/invite/:slug" element={<InviteMembers />} />
             <Route path="/lobby/:slug" element={<RoomLobby />} />
             <Route path="/space/:slug" element={<Space />} />
-            <Route path="/map" element={<DashBoardChat onOpenSpace={() => { }} activeSpaceId={""} currentSubSpace={null} onClose={() => { }} />} />
+            {/* <Route path="/map" element={<DashBoardChat onOpenSpace={() => { }} activeSpaceId={""} currentSubSpace={null} onClose={() => { }} />} /> */}
           </Route>
 
           <Route element={<AdminProtectedRoute />}>
