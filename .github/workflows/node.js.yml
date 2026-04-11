@@ -50,6 +50,6 @@ jobs:
         run: pnpm run build
 
       - name: pm2 install
-        run: pm2 install 
+        run: pnpm install -g pm2
       - name: pm2 restart
         run: pm2 restart all
