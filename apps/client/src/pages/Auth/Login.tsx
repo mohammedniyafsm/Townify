@@ -73,7 +73,8 @@ export function Login() {
   const responseGoogle = async (authResult: any) => {
     try {
       if (authResult?.code) {
-        const response = await axios.get(`http://localhost:8080/auth/googleLogin?code=${authResult.code}`, {
+        const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+        const response = await axios.get(`${baseUrl}/auth/googleLogin?code=${authResult.code}`, {
           withCredentials: true,
         })
         console.log(response.data)

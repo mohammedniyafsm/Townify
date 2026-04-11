@@ -65,8 +65,9 @@ export function SignUp() {
 
   const responseGoogle = async (authResult: any) => {
     try {
+      const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
       if (authResult?.code) {
-        const response = await axios.get(`http://localhost:8080/auth/googleLogin?code=${authResult.code}`, {
+        const response = await axios.get(`${baseUrl}/auth/googleLogin?code=${authResult.code}`, {
           withCredentials: true,
         })
         dispatch(addAuth(response.data.user))
