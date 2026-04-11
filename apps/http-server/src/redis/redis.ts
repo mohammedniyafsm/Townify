@@ -1,6 +1,5 @@
 import { createClient, type RedisClientType } from "redis";
 
-console.log(process.env.REDIS_PUBSUB_URL);
 export const redisPublisher: RedisClientType = createClient({
   url: process.env.REDIS_PUBSUB_URL || "redis://localhost:6379",
 });

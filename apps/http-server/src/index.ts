@@ -19,8 +19,9 @@ app.get('/', (req: Request, res: Response) => {
     res.send("Server Running at 8080");
 })
 
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173").split(",");
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: allowedOrigins,
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH']

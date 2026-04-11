@@ -9,8 +9,8 @@ export const connectSocket = (
   if (socket) {
     return socket;
   }
-
-  socket = new WebSocket("ws://localhost:3008");
+  const wsUrl = import.meta.env.VITE_WS_SERVER_URL || "ws://localhost:3008";
+  socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
     socket?.send(

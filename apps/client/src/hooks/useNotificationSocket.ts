@@ -6,8 +6,8 @@ export function useNotificationSocket(userId?: string) {
   const dispatch = useDispatch();
   useEffect(() => {
     if (!userId) return;
-
-    const ws = new WebSocket("ws://localhost:3010");
+    const wsUrl = import.meta.env.VITE_NOTIFICATION_WS_URL || "ws://localhost:3010";
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       ws.send(
