@@ -51,11 +51,11 @@ jobs:
 
       - name: Move Build to nginx html
         run: |
-        mkdir -p /var/www/townify
-        rm -rf /var/www/townify/*
-        cp -r apps/client/dist/* /var/www/townify/
-        sudo chown -R www-data:www-data /var/www/townify
-        sudo chmod -R 755 /var/www/townify
+          mkdir -p /var/www/townify
+          rm -rf /var/www/townify/*
+          cp -r apps/client/dist/* /var/www/townify/
+          sudo chown -R www-data:www-data /var/www/townify
+          sudo chmod -R 755 /var/www/townify
 
       - name: pm2 install
         run: npm install -g pm2
