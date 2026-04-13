@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { cn } from "@/lib/utils";
 import { approveRequestAccess } from "@/api/SpaceApi";
+import { removeInvitation, addMembers } from "@/Redux/Slice/ManageSpace/ManageSpaceSlice";
 
 type JoinRequest = {
     userName: string;
@@ -17,6 +19,7 @@ export default function JoinRequestToast() {
     const currentSlug = location.pathname.split("/").pop();
 
 
+    const dispatch = useDispatch();
     const [requests, setRequests] = useState<JoinRequest[]>([]);
     const [loadingId, setLoadingId] = useState<string | null>(null);
 
@@ -91,7 +94,11 @@ export default function JoinRequestToast() {
     const handleAccept = async (inviteId: string) => {
         try {
             setLoadingId(inviteId);
-            await approveRequestAccess(inviteId);
+            const response = await approveRequestAccess(inviteId);
+            dispatch(removeInvitation(inviteId));
+            if (response.data?.member) {
+                dispatch(addMembers(response.data.member));
+            }
             remove(inviteId);
         } catch (err) {
             console.error("Approve failed", err);

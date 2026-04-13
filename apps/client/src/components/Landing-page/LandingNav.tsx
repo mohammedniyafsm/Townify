@@ -73,20 +73,19 @@ import { LogoutApi } from "@/api/authApi";
         {open && (
           <div className="md:hidden bg-white px-6 py-4 space-y-4 border-t">
             <div className="flex flex-col gap-4 text-[#52525C] font-inter">
-              <h1 className="cursor-pointer">Home</h1>
-              <h1 className="cursor-pointer">Features</h1>
-              <h1 className="cursor-pointer">Resources</h1>
-              <h1 className="cursor-pointer">Pricing</h1>
+              <h1 onClick={() => { navigate('/'); setOpen(false); }} className="cursor-pointer hover:text-foreground hover:underline">Home</h1>
+              <h1 className="cursor-pointer hover:text-foreground hover:underline">Features</h1>
+              <h1 className="cursor-pointer hover:text-foreground hover:underline">Resources</h1>
+              <h1 onClick={() => { navigate('/pricing'); setOpen(false); }} className="cursor-pointer hover:text-foreground hover:underline">Pricing</h1>
             </div>
 
             <div className="pt-4 flex flex-col gap-3">
-              {LoggedIn === "succeeded" ?
-                <Button onClick={Logout} className="cursor-pointer" variant="outline" >Logout</Button>
-                :
-                <Button className="cursor-pointer" variant="outline" >Login</Button>
-
-              }
-              <RainbowButton className="cursor-pointer">Get Started</RainbowButton>
+              {LoggedIn === "succeeded" ? (
+                <Button onClick={Logout} className="cursor-pointer" variant="outline">Logout</Button>
+              ) : (
+                <Button onClick={() => { navigate('/login'); setOpen(false); }} className="cursor-pointer" variant="outline">Login</Button>
+              )}
+              <RainbowButton onClick={() => { navigate('/app'); setOpen(false); }} className="cursor-pointer">Get Started</RainbowButton>
             </div>
           </div>
         )}
