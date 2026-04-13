@@ -1,3 +1,4 @@
+import React from "react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -30,6 +31,7 @@ export function SignUp() {
   const dispatch = useDispatch<AppDispatch>()
   const [searchParams] = useSearchParams();
   const redirectParam = searchParams.get("redirect");
+  const [googleSubmitting, setGoogleSubmitting] = React.useState(false)
 
   const {
     register,
@@ -64,6 +66,7 @@ export function SignUp() {
   }
 
   const responseGoogle = async (authResult: any) => {
+    setGoogleSubmitting(true)
     try {
       const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
       if (authResult?.code) {
@@ -80,6 +83,8 @@ export function SignUp() {
     } catch (error: any) {
       toast.error(error?.response?.data?.message || error.message || "Google login failed")
       console.error(error)
+    } finally {
+      setGoogleSubmitting(false)
     }
   }
 
@@ -140,8 +145,8 @@ export function SignUp() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
+              <Button type="submit" className="w-full" disabled={isSubmitting || googleSubmitting}>
+                {isSubmitting  ? (
                   <>
                     <Spinner className="mr-2" /> Creating Account...
                   </>
@@ -167,6 +172,7 @@ export function SignUp() {
             <Button
               onClick={() => GoogleLogin()}
               variant="outline"
+              disabled={isSubmitting || googleSubmitting}
               className="w-full cursor-pointer"
               type="button"
             >

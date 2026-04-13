@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const apiKey = process.env.LIVEKIT_API_KEY;
+
 const apiSecret = process.env.LIVEKIT_API_SECRET;
 
 export const getToken = async (req: Request, res: Response) => {

@@ -66,7 +66,7 @@ function VideoTile({ participant, mode, isFocused = false, onEnterExpandedGrid }
                                 participantIdentity={participant.name}
                                 local={participant.isLocal}
                             />
-                            {participant.audioTrack && <AudioComponent track={participant.audioTrack} />}
+                            {participant.audioTrack && !participant.isLocal && <AudioComponent track={participant.audioTrack} />}
                         </div>
                     ) : (
                         <div className="relative aspect-video">
@@ -75,7 +75,7 @@ function VideoTile({ participant, mode, isFocused = false, onEnterExpandedGrid }
                                 participantIdentity={participant.name}
                                 local={participant.isLocal}
                             />
-                            {participant.audioTrack && <AudioComponent track={participant.audioTrack} />}
+                            {participant.audioTrack && !participant.isLocal && <AudioComponent track={participant.audioTrack} />}
                         </div>
                     )}
                 </div>

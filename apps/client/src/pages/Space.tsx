@@ -279,6 +279,23 @@ export default function Space() {
     setVideoViewMode("collapsed");
   };
 
+  useEffect(() => {
+    if (state !== "allowed") return;
+    if (!mapUrl || !spaceId || !user || !localPlayer) return;
+
+    if (visibleParticipants.length === 0 && videoViewMode !== "collapsed") {
+      setVideoViewMode("collapsed");
+    }
+  }, [
+    state,
+    mapUrl,
+    spaceId,
+    user,
+    localPlayer,
+    visibleParticipants.length,
+    videoViewMode,
+  ]);
+
   if (state !== "allowed") {
     return (
       <div className="min-h-screen w-full bg-[#f8fafc] relative">
@@ -294,8 +311,6 @@ export default function Space() {
 
 
   const shouldShowVideoOverlay = visibleParticipants.length > 0;
-
-
 
   return (
     <div className="w-screen h-screen relative overflow-hidden bg-[#0f172a]">

@@ -21,7 +21,7 @@ export default function createConfig(
     },
     physics: {
       default: "arcade",
-      arcade: { debug: true },
+      arcade: { debug: false },
     },
     scene: [new MainScene(mapUrl, avatarMap, localPlayer)],
   };

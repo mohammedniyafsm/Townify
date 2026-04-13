@@ -25,11 +25,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useDispatch } from "react-redux"
 import type { AppDispatch } from "@/Redux/stroe"
 import { addAuth } from "@/Redux/Slice/Auth/Auth"
+import { useState } from "react"
 
 export function Login() {
   const navigate = useNavigate()
   const dispatch = useDispatch<AppDispatch>()
   const [searchParams] = useSearchParams();
+    const [googleSubmitting, setGoogleSubmitting] = useState(false)
+
 
   const redirectParam = searchParams.get("redirect");
 
@@ -71,6 +74,7 @@ export function Login() {
   }
 
   const responseGoogle = async (authResult: any) => {
+    setGoogleSubmitting(true)
     try {
       if (authResult?.code) {
         const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
@@ -89,6 +93,8 @@ export function Login() {
     } catch (error: any) {
       toast.error(error?.response?.data?.message || error.message || "Google login failed")
       console.error(error)
+    } finally {
+      setGoogleSubmitting(false)
     }
   }
 
@@ -137,8 +143,8 @@ export function Login() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
+              <Button type="submit" className="w-full" disabled={isSubmitting || googleSubmitting}>
+                {isSubmitting || googleSubmitting ? (
                   <>
                     <Spinner className="mr-2 h-4 w-4" />
                     Logging in...
@@ -162,7 +168,7 @@ export function Login() {
               </div>
             </div>
 
-            <Button onClick={() => googleLogin()} variant="outline" className="w-full cursor-pointer">
+            <Button onClick={() => googleLogin()} disabled={isSubmitting || googleSubmitting} variant="outline" className="w-full cursor-pointer">
               <GoogleIcon className="mr-2 h-5 w-5 " />
               Continue with Google
             </Button>

@@ -5,7 +5,15 @@ import axios from "axios";
 import { userVerifyTokenApi } from "./api/authApi";
 import { adminVerifyTokenApi } from "./api/adminApi";
 import { ProtectedLoading } from "./components/JoinRoom/Loading";
+import MobileRestricted from "./components/JoinRoom/MobileRestricted";
 
+
+export const DesktopOnlyRoute = () => {
+  const isTouchDevice =
+    window.matchMedia("(pointer: coarse) and (hover: none)").matches ||
+    window.innerWidth < 600;
+  return isTouchDevice ? <MobileRestricted /> : <Outlet />;
+};
 
 export const ProtectedRoute = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
