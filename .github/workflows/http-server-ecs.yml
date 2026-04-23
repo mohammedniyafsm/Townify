@@ -3,15 +3,18 @@ name: Deploy to Amazon ECS
 on:
   push:
     branches:
-      - disabled-branch
+      - main
+  pull_request:
+    branches:
+      - main
 
 env:
   AWS_REGION: ap-south-1
   ECR_REPOSITORY: mohammedayad10/townify-http
-  ECS_SERVICE: lms-task-service-u8528sn3
-  ECS_CLUSTER: lms-ecs-cluster
-  TASK_DEFINITION_FAMILY: lms-task
-  CONTAINER_NAME: lms-image
+  ECS_SERVICE: townify-http-service
+  ECS_CLUSTER: townify
+  TASK_DEFINITION_FAMILY: townify-http-task
+  CONTAINER_NAME: townify-http-image
 
 jobs:
   deploy:
