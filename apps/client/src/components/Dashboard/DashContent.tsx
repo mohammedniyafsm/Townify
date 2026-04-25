@@ -148,22 +148,22 @@ function DashContent({
       )}
 
       {/* Spaces Grid */}
-      <div className="flex flex-wrap gap-10 items-center py-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10 py-5 w-full">
         {userMap?.status === "loading" || userMap?.status === "idle" || isPending ? (
           // Loading shimmer
-          <div className="flex flex-wrap gap-6">
+          <>
             {[...Array(3)].map((_, index) => (
               <MapCardShimmer key={index} />
             ))}
-          </div>
+          </>
         ) : filteredSpaces.length > 0 ? (
           // Filtered spaces
           filteredSpaces.map((map) => (
-            <div key={map?.id} className="">
-              <div>
+            <div key={map?.id} className="w-full flex-col">
+              <div className="w-full">
                 <img
                   onClick={() => navigate(`/lobby/${map?.slug}`)}
-                  className="rounded-2xl h-72 w-90 cursor-pointer hover:opacity-90 transition-opacity"
+                  className="rounded-2xl h-64 sm:h-72 w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                   src={map?.map?.thumbnail}
                   alt={map?.name || "Space thumbnail"}
                 />
@@ -225,7 +225,7 @@ function DashContent({
           ))
         ) : searchQuery ? (
           // No search results
-          <div className="w-full text-center py-12">
+          <div className="w-full text-center py-12 col-span-1 md:col-span-2 lg:col-span-3">
             <Search className="h-12 w-12 mx-auto text-gray-300 mb-4" />
             <h3 className="text-lg font-semibold text-gray-700 mb-2">
               No spaces found

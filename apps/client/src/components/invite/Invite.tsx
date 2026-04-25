@@ -101,22 +101,22 @@ function Invite() {
         <div>
             <Navbar />
 
-            <div className="flex justify-center gap-10 mt-10">
-                <div className="font-bricogrotesque text-4xl font-semibold">
-                    <h1 className="text-2xl">Your office has been created.</h1>
-                    <h1>Next, let’s bring in your team</h1>
-                    <h1 className="text-base">
+            <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start gap-8 lg:gap-10 mt-10 px-4 lg:px-0">
+                <div className="font-bricogrotesque text-4xl font-semibold flex flex-col items-center lg:items-start text-center lg:text-left">
+                    <h1 className="text-xl lg:text-2xl">Your office has been created.</h1>
+                    <h1 className="text-2xl lg:text-4xl mt-1 lg:mt-0">Next, let’s bring in your team</h1>
+                    <h1 className="text-sm lg:text-base mt-2 lg:mt-0">
                         Try inviting some teammates to join the space with you.
                     </h1>
                     <img
-                        className="h-20"
+                        className="h-16 lg:h-20 mt-4 lg:mt-0"
                         src="https://res.cloudinary.com/djbawwbzi/image/upload/v1765445208/Framesdgvsdf_2_axssox.png"
                         alt=""
                     />
                 </div>
 
-                <div className="flex flex-col gap-2">
-                    <div className="border rounded-lg p-2 flex flex-wrap gap-2 bg-background w-96">
+                <div className="flex flex-col gap-2 w-full max-w-sm lg:w-auto">
+                    <div className="border rounded-lg p-2 flex flex-wrap gap-2 bg-background w-full lg:w-96">
                         {emails.map(email => (
                             <div
                                 key={email}
@@ -143,10 +143,10 @@ function Invite() {
                         />
                     </div>
 
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex flex-col sm:flex-row gap-2 mt-4 w-full">
                         <Button
                             onClick={copyLink}
-                            className="font-bricogrotesque"
+                            className="font-bricogrotesque w-full sm:w-auto flex-1"
                             variant={"secondary"}
                         >
                             Or copy invite link {copy ? <Check /> : <Link />}
@@ -155,10 +155,10 @@ function Invite() {
                         <RainbowButton
                             onClick={handleInvite}
                             disabled={!canContinue || loading}
-                            className="font-bricogrotesque"
+                            className="font-bricogrotesque w-full sm:w-auto flex-1"
                         >
                             {loading ? (
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 justify-center items-center">
                                     <Spinner />
                                     Sending invites…
                                 </div>
