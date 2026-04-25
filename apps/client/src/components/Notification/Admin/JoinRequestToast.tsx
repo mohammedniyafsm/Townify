@@ -109,7 +109,7 @@ export default function JoinRequestToast() {
     if (requests.length === 0) return null;
 
     return (
-        <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-2">
+        <div className="fixed top-4 right-4 z-[9999999] flex flex-col gap-2">
             {requests.map(req => (
                 <div
                     key={req.inviteId}

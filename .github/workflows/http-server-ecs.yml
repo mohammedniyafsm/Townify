@@ -3,10 +3,7 @@ name: Deploy to Amazon ECS
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - disabled-branch
 
 env:
   AWS_REGION: ap-south-1

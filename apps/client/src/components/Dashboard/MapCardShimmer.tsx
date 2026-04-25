@@ -3,9 +3,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export const MapCardShimmer = () => {
   return (
-    <div className="">
+    <div className="w-full flex-col">
       {/* Thumbnail shimmer */}
-      <Skeleton className="rounded-3xl h-72 w-90" />
+      <Skeleton className="rounded-3xl h-64 sm:h-72 w-full" />
 
       {/* Bottom content shimmer */}
       <div className="flex justify-between px-1 py-2">
