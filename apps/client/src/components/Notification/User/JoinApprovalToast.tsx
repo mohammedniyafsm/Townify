@@ -62,7 +62,7 @@ export default function JoinApprovalToast() {
 
   return (
     <div className={cn(
-      "fixed top-4 right-4 z-50",
+      "fixed top-4 right-4 z-500",
       "w-[320px] rounded-lg",
       "bg-neutral-900/90 text-white",
       "backdrop-blur-md",

@@ -1,0 +1,57 @@
+name: townify-notification-ci-cd
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v6
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./apps/notification-ws/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: mohammedayad10/townify-notification:${{github.sha}}
+
+      - name: Update deployment in Gitops repo
+        run: |
+          mkdir Gitops
+          cd Gitops
+          git clone https://x-access-token:${{ secrets.REPO_B_PAT }}@github.com/m-ayad10/Gitops.git .
+
+          cd townify
+
+          echo "before change"
+          cat notification-manifest.yml
+          sed -i "s|image: mohammedayad10/townify-notification:.*|image: mohammedayad10/townify-notification:${{ github.sha }}|g" notification-manifest.yml
+          echo "after change"
+          cat notification-manifest.yml
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add .
+          git commit -m "Update image tag to ${{github.sha}} in townify-notification"
+          git push origin main
